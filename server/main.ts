@@ -2,6 +2,7 @@
 
 import { Command } from "@commander-js/extra-typings"
 import { unified, type Plugin, type Processor } from "unified"
+import { find } from "unist-util-find"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
@@ -15,7 +16,7 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
-import type { Node } from "hast"
+import type { Node, Element } from "hast"
 
 const src = path.join(process.cwd(), "src")
 const out = path.join(process.cwd(), "out")
@@ -34,13 +35,32 @@ async function generateAssets() {
 
 const wrapWithRoot: Plugin = () => {
   return (tree: Node) => {
-    return {
-      type: "element", tagName: "div", properties: { id: "root" }, children: [tree],
-    }
+    return { type: "element", tagName: "div", properties: { id: "root" }, children: [tree] }
   }
 }
 
 const eventSourceEndpoint = "/event"
+
+const injectAssets: (mode: "development" | "production") => Plugin = (mode) => () => {
+  return (tree: Node) => {
+    const headNode = find<Element>(tree, { tagName: "head" })!
+    headNode.children.push(
+      { type: "element", tagName: "script", properties: { type: "module", src: "/index.js" }, children: [] },
+      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: "/index.css" }, children: [] },
+    )
+
+    if (mode === "development") {
+      headNode.children.push({
+        type: "element", tagName: "script", properties: { type: "module" }, children: [
+          {
+            type: "text",
+            value: `(()=>{new EventSource("${eventSourceEndpoint}").onmessage=(e)=>{if(e.data===location.pathname){location.reload()}}})()`,
+          },
+        ],
+      })
+    }
+  }
+}
 
 async function generate(processor: Processor<any, any, any, any, any>, input: string, onGenerate?: (pathname: string) => void) {
   const document = await fs.readFile(input, "utf8")
@@ -64,6 +84,7 @@ function createProcessor(mode: "development" | "production") {
     .use(remarkRehype)
     .use(wrapWithRoot)
     .use(rehypeDocument)
+    .use(injectAssets(mode))
     .use(rehypeStringify)
 }
 

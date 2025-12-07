@@ -45,8 +45,8 @@ const injectAssets: (mode: "development" | "production") => Plugin = (mode) => (
   return (tree: Node) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
-      { type: "element", tagName: "script", properties: { type: "module", src: "/index.js" }, children: [] },
-      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: "/index.css" }, children: [] },
+      { type: "element", tagName: "script", properties: { type: "module", src: "index.js" }, children: [] },
+      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: "index.css" }, children: [] },
     )
 
     if (mode === "development") {

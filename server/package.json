@@ -3,10 +3,24 @@
   "version": "0.0.0",
   "description": "",
   "main": "main.ts",
+  "type": "module",
+  "bin": {
+    "mdgraph": "main.ts"
+  },
   "scripts": {},
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
-    "mdgraph-client": "workspace:*"
+    "@commander-js/extra-typings": "^14.0.0",
+    "chokidar": "^5.0.0",
+    "mdgraph-client": "workspace:*",
+    "rehype-document": "^7.0.3",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "sirv": "^3.0.2",
+    "string-width": "^8.1.0",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

@@ -41,12 +41,12 @@ const wrapWithRoot: Plugin = () => {
 
 const eventSourceEndpoint = "/event"
 
-const injectAssets: (mode: "development" | "production") => Plugin = (mode) => () => {
+const injectAssets: (mode: "development" | "production", base: string) => Plugin = (mode, base) => () => {
   return (tree: Node) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
-      { type: "element", tagName: "script", properties: { type: "module", src: "index.js" }, children: [] },
-      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: "index.css" }, children: [] },
+      { type: "element", tagName: "script", properties: { type: "module", src: `${base}index.js` }, children: [] },
+      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: `${base}index.css` }, children: [] },
     )
 
     if (mode === "development") {
@@ -77,14 +77,14 @@ async function generate(processor: Processor<any, any, any, any, any>, input: st
   onGenerate?.(pathname)
 }
 
-function createProcessor(mode: "development" | "production") {
+function createProcessor(mode: "development" | "production", base: string) {
   return unified()
     .use(remarkParse)
     .use(remarkGfm, { stringLength: stringWidth })
     .use(remarkRehype)
     .use(wrapWithRoot)
     .use(rehypeDocument)
-    .use(injectAssets(mode))
+    .use(injectAssets(mode, base))
     .use(rehypeStringify)
 }
 
@@ -95,10 +95,10 @@ async function init() {
   ])
 }
 
-async function build() {
+async function build(base: string) {
   await generateAssets()
 
-  const processor = createProcessor("production")
+  const processor = createProcessor("production", base)
 
   for await (const input of fs.glob(path.join(src, "**/*.md"))) {
     await generate(processor, input)
@@ -107,10 +107,10 @@ async function build() {
   console.log("Build completed")
 }
 
-async function serve(port: number) {
+async function serve(base: string, port: number) {
   await generateAssets()
 
-  const processor = createProcessor("development")
+  const processor = createProcessor("development", base)
 
   const clients: Record<string, http.ServerResponse> = {}
   function sendEventToAll(pathname: string) {
@@ -165,16 +165,20 @@ program
 
 program
   .command("build")
-  .action(() => {
-    void build()
+  .option("-b, --base <path>", "base path", "/")
+  .action((options) => {
+    const base = options.base
+    void build(base)
   })
 
 program
   .command("serve")
+  .option("-b, --base <path>", "base path", "/")
   .option("-p, --port <number>", "port number", "3000")
   .action((options) => {
+    const base = options.base
     const port = parseInt(options.port)
-    void serve(port)
+    void serve(base, port)
   })
 
 program.parse(process.argv)

@@ -1,10 +1,28 @@
 import { StrictMode, useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import "./index.css"
-import { FileMdIcon, GraphIcon, TranslateIcon } from "@phosphor-icons/react"
+import { FileMdIcon, GraphIcon, SparkleIcon, TranslateIcon } from "@phosphor-icons/react"
 
 const rootElement = document.getElementById("root")!
+const originalText = rootElement.innerText
 const originalHtml = rootElement.innerHTML
+
+async function summarize(text: string): Promise<ReadableStream<string> | undefined> {
+  if (!("Summarizer" in window)) { return undefined }
+
+  const options: SummarizerCreateCoreOptions = {
+    type: "tldr",
+    format: "plain-text",
+    outputLanguage: navigator.language,
+  }
+  const availability = await Summarizer.availability(options)
+  if (availability === "unavailable") { return undefined }
+
+  if (navigator.userActivation.isActive) {
+    const summarizer = await Summarizer.create(options)
+    return summarizer.summarizeStreaming(text)
+  }
+}
 
 async function checkTranslatorAvailability(text: string): Promise<{
   sourceLanguage: string,
@@ -46,15 +64,15 @@ async function translate(text: string): Promise<string | undefined> {
   return translatedText
 }
 
-const text = "Hello, world!"
-
 function Document() {
   const markdownPathname = `${location.pathname}${location.pathname.endsWith("/") ? "index" : ""}.md`
+
+  const [summary, setSummary] = useState<string | undefined>(undefined)
 
   const [canTranslate, setCanTranslate] = useState(false)
   useEffect(() => {
     void (async () => {
-      const availability = await checkTranslatorAvailability(text)
+      const availability = await checkTranslatorAvailability(originalText)
       setCanTranslate(availability !== undefined)
     })()
   }, [])
@@ -68,8 +86,9 @@ function Document() {
           disabled={!canTranslate}
           onClick={() => {
             void (async () => {
-              const result = await translate(text)
-              console.log(text, result)
+              const result = await translate(originalText)
+              console.log(originalText)
+              console.log(result)
             })()
           }}
           className="disabled:opacity-50 disabled:cursor-not-allowed"
@@ -90,7 +109,34 @@ function Document() {
           <FileMdIcon size={24} />
         </a>
       </div>
-      <div className="mx-auto px-4 py-8 prose prose-zinc" dangerouslySetInnerHTML={{ __html: originalHtml }} />
+      <div className="mx-auto px-4 py-8 prose prose-zinc">
+        <div className="mb-4 p-2 border border-zinc-300 rounded bg-zinc-50">
+          <button
+            title="Summarize"
+            aria-label="Summarize"
+            onClick={() => {
+              setSummary(undefined)
+              void (async () => {
+                const summary = await summarize(originalText)
+                if (summary !== undefined) {
+                  const reader = summary.getReader()
+                  while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) { break }
+                    setSummary((prev) => (prev ?? "") + (value ?? ""))
+                  }
+                }
+              })()
+            }}
+          >
+            <SparkleIcon size={24} />
+          </button>
+          {summary !== undefined ? (
+            <div className="text-left">{summary}</div>
+          ) : null}
+        </div>
+        <div dangerouslySetInnerHTML={{ __html: originalHtml }} />
+      </div>
     </div>
   )
 }

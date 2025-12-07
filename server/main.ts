@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 import { Command } from "@commander-js/extra-typings"
-import { unified, type Processor } from "unified"
+import { unified, type Plugin, type Processor } from "unified"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
 import http from "node:http"
 import path from "node:path"
+import url from "node:url"
 import rehypeDocument from "rehype-document"
 import rehypeStringify from "rehype-stringify"
 import remarkGfm from "remark-gfm"
@@ -14,9 +15,30 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
+import type { Node } from "hast"
 
 const src = path.join(process.cwd(), "src")
 const out = path.join(process.cwd(), "out")
+
+async function generateAssets() {
+  const assetsUrl = import.meta.resolve("mdgraph-client/dist/assets")
+  const assetsPath = url.fileURLToPath(assetsUrl)
+  await fs.mkdir(out, { recursive: true })
+  const files = await fs.readdir(assetsPath)
+  for (const file of files) {
+    const srcPath = path.join(assetsPath, file)
+    const outPath = path.join(out, file)
+    await fs.copyFile(srcPath, outPath)
+  }
+}
+
+const wrapWithRoot: Plugin = () => {
+  return (tree: Node) => {
+    return {
+      type: "element", tagName: "div", properties: { id: "root" }, children: [tree],
+    }
+  }
+}
 
 const eventSourceEndpoint = "/event"
 
@@ -40,6 +62,7 @@ function createProcessor(mode: "development" | "production") {
     .use(remarkParse)
     .use(remarkGfm, { stringLength: stringWidth })
     .use(remarkRehype)
+    .use(wrapWithRoot)
     .use(rehypeDocument)
     .use(rehypeStringify)
 }
@@ -52,6 +75,8 @@ async function init() {
 }
 
 async function build() {
+  await generateAssets()
+
   const processor = createProcessor("production")
 
   for await (const input of fs.glob(path.join(src, "**/*.md"))) {
@@ -62,6 +87,8 @@ async function build() {
 }
 
 async function serve(port: number) {
+  await generateAssets()
+
   const processor = createProcessor("development")
 
   const clients: Record<string, http.ServerResponse> = {}

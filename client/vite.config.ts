@@ -9,4 +9,13 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rolldownOptions: {
+      output: {
+        assetFileNames: "assets/[name].[ext]",
+        chunkFileNames: "assets/[name].js",
+        entryFileNames: "assets/[name].js",
+      },
+    },
+  },
 })

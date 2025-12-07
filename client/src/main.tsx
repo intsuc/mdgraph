@@ -18,7 +18,7 @@ function Document() {
           <FileMdIcon size={20} />
         </a>
       </div>
-      <div dangerouslySetInnerHTML={{ __html: rootElement.innerHTML }} />
+      <div className="mx-auto my-8 prose prose-zinc" dangerouslySetInnerHTML={{ __html: rootElement.innerHTML }} />
     </div>
   )
 }

@@ -10,15 +10,15 @@ function Document() {
 
   return (
     <div>
-      <div className="p-1 sticky top-0 flex gap-1 justify-end border-b border-zinc-200 bg-white">
+      <div className="p-2 sticky top-0 flex gap-2 justify-end border-b border-zinc-200 bg-white">
         <a>
-          <GraphIcon size={20} />
+          <GraphIcon size={24} />
         </a>
         <a href={markdownPathname}>
-          <FileMdIcon size={20} />
+          <FileMdIcon size={24} />
         </a>
       </div>
-      <div className="mx-auto my-8 prose prose-zinc" dangerouslySetInnerHTML={{ __html: rootElement.innerHTML }} />
+      <div className="mx-auto px-4 py-8 prose prose-zinc" dangerouslySetInnerHTML={{ __html: rootElement.innerHTML }} />
     </div>
   )
 }

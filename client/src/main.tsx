@@ -6,7 +6,7 @@ import { FileMdIcon, GraphIcon } from "@phosphor-icons/react"
 const rootElement = document.getElementById("root")!
 
 function Document() {
-  const markdownPathname = location.pathname === "/" ? "/index.md" : `${location.pathname}.md`
+  const markdownPathname = `${location.pathname}${location.pathname.endsWith("/") ? "index" : ""}.md`
 
   return (
     <div>

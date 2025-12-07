@@ -26,7 +26,7 @@ A link to [GitHub](https://github.com).
 
 An inline image:
 
-![Placeholder image](https://avatars.githubusercontent.com/u/30471370 "Example image")
+![Placeholder image](https://picsum.photos/300/200 "Example image")
 
 ## Code blocks
 

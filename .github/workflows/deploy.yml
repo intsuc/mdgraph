@@ -37,6 +37,7 @@ jobs:
           pnpm install
           pnpm -C client build
           pnpm -C server link --global
+          pnpm setup
           cd example
           $PNPM_HOME/mdgraph build
       - name: Setup Pages

@@ -36,10 +36,8 @@ jobs:
         run: |
           pnpm install
           pnpm -C client build
-          pnpm -C server link --global
-          pnpm setup
           cd example
-          $PNPM_HOME/mdgraph build
+          node ../server/main.ts
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

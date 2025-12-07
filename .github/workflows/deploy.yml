@@ -37,7 +37,7 @@ jobs:
           pnpm install
           pnpm -C client build
           cd example
-          node ../server/main.ts
+          node ../server/main.ts build
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

@@ -30,13 +30,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 25
           cache: "pnpm"
-      - name: Install dependencies and build
+      - name: Build mdgraph
         run: |
           pnpm install
           pnpm -C client build
           pnpm -C server link --global
+      - name: Build pages
+        run: |
           cd example
           mdgraph build
       - name: Setup Pages

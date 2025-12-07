@@ -35,9 +35,11 @@ jobs:
       - name: Build
         run: |
           pnpm install
-          cd client && pnpm build
-          cd server && pnpm link
-          cd example
+          cd client
+          pnpm build
+          cd ../server
+          pnpm link
+          cd ../example
           mdgraph build
       - name: Setup Pages
         uses: actions/configure-pages@v5

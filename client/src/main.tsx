@@ -21,7 +21,7 @@ async function checkTranslatorAvailability(text: string): Promise<{
   const targetLanguage = navigator.language
 
   const availability = await Translator.availability({ sourceLanguage, targetLanguage })
-  if (availability !== "available") { return undefined }
+  if (availability === "unavailable") { return undefined }
 
   return { sourceLanguage, targetLanguage }
 }
@@ -38,7 +38,7 @@ async function translate(text: string): Promise<string | undefined> {
   const targetLanguage = navigator.language
 
   const availability = await Translator.availability({ sourceLanguage, targetLanguage })
-  if (availability !== "available") { return undefined }
+  if (availability === "unavailable") { return undefined }
 
   const translator = await Translator.create({ sourceLanguage, targetLanguage })
   const translatedText = await translator.translate(text)

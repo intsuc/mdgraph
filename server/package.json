@@ -1,0 +1,15 @@
+{
+  "name": "mdgraph-server",
+  "version": "0.0.0",
+  "description": "",
+  "main": "main.ts",
+  "scripts": {},
+  "packageManager": "pnpm@10.24.0",
+  "dependencies": {
+    "mdgraph-client": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}

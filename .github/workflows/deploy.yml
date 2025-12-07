@@ -38,7 +38,7 @@ jobs:
           pnpm -C client build
           pnpm -C server link
           cd example
-          pnpm -C ../server exec mdgraph build
+          $PNPM_HOME/mdgraph build
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

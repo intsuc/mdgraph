@@ -65,7 +65,6 @@ const injectAssets: (mode: "development" | "production", base: string) => Plugin
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
       { type: "element", tagName: "script", properties: { type: "module", src: `${base}index.js` }, children: [] },
-      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: `${base}index.css` }, children: [] },
     )
 
     if (mode === "development") {
@@ -97,6 +96,7 @@ async function generate({ src, out }: Config, processor: Processor<any, any, any
 }
 
 function createProcessor(mode: "development" | "production", base: string) {
+  base = mode === "production" ? base : "/"
   return unified()
     .use(remarkParse)
     .use(remarkGfm, { stringLength: stringWidth })
@@ -104,7 +104,7 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, { behavior: "wrap" })
     .use(wrapWithRoot)
-    .use(rehypeDocument)
+    .use(rehypeDocument, { css: `${base}index.css` })
     .use(rehypeMeta, { og: true, type: "article" })
     .use(injectAssets(mode, base))
     .use(rehypePresetMinify)

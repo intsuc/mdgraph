@@ -56,6 +56,7 @@ const wrapWithRoot: Plugin = () => {
 const eventSourceEndpoint = "/event"
 
 const injectAssets: (mode: "development" | "production", base: string) => Plugin = (mode, base) => () => {
+  base = mode === "production" ? base : "/"
   return (tree: Node) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(

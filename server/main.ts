@@ -11,6 +11,7 @@ import rehypeDocument from "rehype-document"
 import rehypeSlug from "rehype-slug"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeMeta from "rehype-meta"
+import rehypePresetMinify from "rehype-preset-minify"
 import rehypeStringify from "rehype-stringify"
 import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
@@ -106,6 +107,7 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(rehypeDocument)
     .use(rehypeMeta, { og: true, type: "article" })
     .use(injectAssets(mode, base))
+    .use(rehypePresetMinify)
     .use(rehypeStringify)
 }
 

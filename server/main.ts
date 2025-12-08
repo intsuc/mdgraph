@@ -8,6 +8,8 @@ import http from "node:http"
 import path from "node:path"
 import url from "node:url"
 import rehypeDocument from "rehype-document"
+import rehypeSlug from "rehype-slug"
+import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeStringify from "rehype-stringify"
 import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
@@ -97,6 +99,8 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(remarkParse)
     .use(remarkGfm, { stringLength: stringWidth })
     .use(remarkRehype)
+    .use(rehypeSlug)
+    .use(rehypeAutolinkHeadings, { behavior: "wrap" })
     .use(wrapWithRoot)
     .use(rehypeDocument)
     .use(injectAssets(mode, base))

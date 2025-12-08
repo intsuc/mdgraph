@@ -1,0 +1,7 @@
+{
+  "$schema": "./.mdgraph/schema.json",
+  "src": "src",
+  "out": "out",
+  "base": "/mdgraph/",
+  "port": 3000
+}

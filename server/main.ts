@@ -17,11 +17,27 @@ import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
 import type { Node, Element } from "hast"
+import z from "zod"
 
-const src = path.join(process.cwd(), "src")
-const out = path.join(process.cwd(), "out")
+const configSchema = z.object({
+  $schema: z.string().default("./.mdgraph/schema.json"),
+  src: z.string().default("src"),
+  out: z.string().default("out"),
+  base: z.string().default("/"),
+  port: z.number().default(3000),
+})
 
-async function generateAssets() {
+type Config = z.infer<typeof configSchema>
+
+async function getConfig(): Promise<Config> {
+  try {
+    return configSchema.parse(JSON.parse(await fs.readFile("mdgraph.json", "utf8")))
+  } catch {
+    return configSchema.parse({})
+  }
+}
+
+async function generateAssets({ out }: Config) {
   const assetsUrl = import.meta.resolve("mdgraph-client/dist/assets")
   const assetsPath = url.fileURLToPath(assetsUrl)
   await fs.mkdir(out, { recursive: true })
@@ -62,7 +78,7 @@ const injectAssets: (mode: "development" | "production", base: string) => Plugin
   }
 }
 
-async function generate(processor: Processor<any, any, any, any, any>, input: string, onGenerate?: (pathname: string) => void) {
+async function generate({ src, out }: Config, processor: Processor<any, any, any, any, any>, input: string, onGenerate?: (pathname: string) => void) {
   const document = await fs.readFile(input, "utf8")
   const file = await processor.process(document)
 
@@ -90,27 +106,34 @@ function createProcessor(mode: "development" | "production", base: string) {
 
 async function init() {
   await Promise.all([
-    fs.mkdir(src, { recursive: true }),
-    fs.writeFile(path.join(process.cwd(), ".gitignore"), "/out/\n", "utf8"),
+    fs.mkdir(".mdgraph", { recursive: true }).then(() =>
+      fs.writeFile(path.join(".mdgraph", "schema.json"), JSON.stringify(z.toJSONSchema(configSchema), null, 2) + "\n", "utf8")
+    ),
+    getConfig().then((config) =>
+      fs.writeFile("mdgraph.json", JSON.stringify(config, null, 2) + "\n", "utf8")
+    ),
+    fs.mkdir("src", { recursive: true }),
+    fs.mkdir("out", { recursive: true }),
+    fs.writeFile(path.join(process.cwd(), ".gitignore"), "/.mdgraph/\n/out/\n", "utf8"),
   ])
 }
 
-async function build(base: string) {
-  await generateAssets()
+async function build(config: Config) {
+  await generateAssets(config)
 
-  const processor = createProcessor("production", base)
+  const processor = createProcessor("production", config.base)
 
-  for await (const input of fs.glob(path.join(src, "**/*.md"))) {
-    await generate(processor, input)
+  for await (const input of fs.glob(path.join(config.src, "**/*.md"))) {
+    await generate(config, processor, input)
   }
 
   console.log("Build completed")
 }
 
-async function serve(base: string, port: number) {
-  await generateAssets()
+async function serve(config: Config) {
+  await generateAssets(config)
 
-  const processor = createProcessor("development", base)
+  const processor = createProcessor("development", config.base)
 
   const clients: Record<string, http.ServerResponse> = {}
   function sendEventToAll(pathname: string) {
@@ -119,7 +142,7 @@ async function serve(base: string, port: number) {
     }
   }
 
-  const handler = sirv(out, { dev: true })
+  const handler = sirv(config.out, { dev: true })
   http.createServer((req, res) => {
     switch (req.url) {
       case undefined: {
@@ -146,13 +169,13 @@ async function serve(base: string, port: number) {
         return
       }
     }
-  }).listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`)
+  }).listen(config.port, () => {
+    console.log(`Server is running at http://localhost:${config.port}`)
   })
 
-  chokidar.watch(src)
-    .on("add", (path) => void generate(processor, path, sendEventToAll))
-    .on("change", (path) => void generate(processor, path, sendEventToAll))
+  chokidar.watch(config.src)
+    .on("add", (path) => void generate(config, processor, path, sendEventToAll))
+    .on("change", (path) => void generate(config, processor, path, sendEventToAll))
 }
 
 const program = new Command()
@@ -165,20 +188,16 @@ program
 
 program
   .command("build")
-  .option("-b, --base <path>", "base path", "/")
-  .action((options) => {
-    const base = options.base
-    void build(base)
+  .action(async () => {
+    const config = await getConfig()
+    await build(config)
   })
 
 program
   .command("serve")
-  .option("-b, --base <path>", "base path", "/")
-  .option("-p, --port <number>", "port number", "3000")
-  .action((options) => {
-    const base = options.base
-    const port = parseInt(options.port)
-    void serve(base, port)
+  .action(async () => {
+    const config = await getConfig()
+    await serve(config)
   })
 
 program.parse(process.argv)

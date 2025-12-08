@@ -10,6 +10,7 @@ import url from "node:url"
 import rehypeDocument from "rehype-document"
 import rehypeSlug from "rehype-slug"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
+import rehypeMeta from "rehype-meta"
 import rehypeStringify from "rehype-stringify"
 import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
@@ -103,6 +104,7 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(rehypeAutolinkHeadings, { behavior: "wrap" })
     .use(wrapWithRoot)
     .use(rehypeDocument)
+    .use(rehypeMeta, { og: true, type: "article" })
     .use(injectAssets(mode, base))
     .use(rehypeStringify)
 }

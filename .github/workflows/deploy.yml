@@ -35,9 +35,8 @@ jobs:
       - name: Build
         run: |
           pnpm install
-          cd client
+          cd server
           pnpm build
-          cd ../server
           pnpm link
           cd ../example
           mdgraph build -b /mdgraph/

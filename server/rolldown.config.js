@@ -9,4 +9,5 @@ export default defineConfig({
     banner: "#!/usr/bin/env node",
     minify: true,
   },
+  external: /node_modules/,
 })

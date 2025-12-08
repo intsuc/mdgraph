@@ -5,7 +5,7 @@
   "main": "main.ts",
   "type": "module",
   "bin": {
-    "mdgraph": "dist/bundler.js"
+    "mdgraph": "dist/bundle.js"
   },
   "scripts": {
     "build": "pnpm -C ../client build && rolldown -c"

@@ -8,7 +8,7 @@
     "mdgraph": "dist/bundle.js"
   },
   "scripts": {
-    "build": "pnpm -C ../client build && rolldown -c"
+    "build": "cd ../client && pnpm build && cd ../server && rolldown -c"
   },
   "packageManager": "pnpm@10.24.0",
   "dependencies": {

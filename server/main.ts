@@ -79,11 +79,9 @@ const rehypeTypst: Plugin = () => {
       if (parentElement.type === "element" && parentElement.tagName === "pre") {
         display = "block"
         targetElement = parentElement
-        targetElement.tagName = "div"
       } else {
         display = "inline"
         targetElement = codeElement
-        targetElement.tagName = "span"
       }
 
       try {
@@ -99,8 +97,8 @@ $${codeValue}$
         const height = parseFloat(svgElement.properties.dataHeight as string)
         svgElement.properties.width = `${width / 11}em`
         svgElement.properties.height = `${height / 11}em`
-        targetElement.children = [svgElement]
-        targetElement.properties.style = display === "inline" ? "display: inline-block;" : "display: block;"
+        svgElement.properties.style = display === "inline" ? "display: inline-block;" : "display: block;"
+        Object.assign(targetElement, svgElement)
       } catch (e) {
         targetElement.properties.style = "color: red;"
       }

@@ -78,9 +78,15 @@ importers:
       '@commander-js/extra-typings':
         specifier: ^14.0.0
         version: 14.0.0(commander@14.0.2)
+      '@myriaddreamin/typst-ts-node-compiler':
+        specifier: 0.7.0-rc1
+        version: 0.7.0-rc1
       chokidar:
         specifier: ^5.0.0
         version: 5.0.0
+      hast-util-from-html-isomorphic:
+        specifier: ^2.0.0
+        version: 2.0.0
       mdgraph-client:
         specifier: workspace:*
         version: link:../client
@@ -126,6 +132,9 @@ importers:
       unist-util-find:
         specifier: ^3.0.0
         version: 3.0.0
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.0.0
       zod:
         specifier: ^4.1.13
         version: 4.1.13
@@ -308,6 +317,76 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@myriaddreamin/typst-ts-node-compiler-android-arm-eabi@0.7.0-rc1':
+    resolution: {integrity: sha512-RCQIrcvEow+n5FZRBUDBgXFJEH23/l2sm4ODsAVKDuyT0HARfHHJtxjbnYriVF4oLp3q2n9Vst/DkbOGczzHiQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [android]
+
+  '@myriaddreamin/typst-ts-node-compiler-android-arm64@0.7.0-rc1':
+    resolution: {integrity: sha512-CGnwtw2KAP5VoKrqjHAy7setrPMm4mtUmqDCbQih7wyBIvL4al6lGK6zJIoRamLqFBX+eLAuBQcEcT6kTrvP4w==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [android]
+
+  '@myriaddreamin/typst-ts-node-compiler-darwin-arm64@0.7.0-rc1':
+    resolution: {integrity: sha512-iE9jJY7X9Dbyf5ONhAlqIAo1hLA6cDj0VMjmdTRjzLWoCEhDqQQk37yUZbyRkCvqtSM7zqGz4QXsvphx7Qg1yg==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@myriaddreamin/typst-ts-node-compiler-darwin-x64@0.7.0-rc1':
+    resolution: {integrity: sha512-DLu8yZCLSJQFvzHh9Kjd4ZzNazEYv/J6wOVZPiTgWv7GncOj0C6KLjIfemNhSHbXeoXwiBvo81CCXt5d2BinwA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-arm-gnueabihf@0.7.0-rc1':
+    resolution: {integrity: sha512-C110dpw0UG0O6bN2ASK4aQUnprT1NU5gRSUHQ3GcmiyrY2doD/6Mhy/rhYdgQ/jx/XahrZON+iFIDNm17rqbfg==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [linux]
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-gnu@0.7.0-rc1':
+    resolution: {integrity: sha512-TwlYVhyvpXgG06S/iABKLKEHekQAjjwgs3TUd6mbvGb+K+B8BQcOIPZlixoViUBPCKKr2HpEJTaFrC8NPJ+UNw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-musl@0.7.0-rc1':
+    resolution: {integrity: sha512-ka4BXZSDvbTMLQ/4IxsWUzAyOJrAmMKAg1ZbEGHwVBwSY+etRyH8nSKAu3tKKTd5Ncf/Vr20fj5sHj+SCgENHA==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-x64-gnu@0.7.0-rc1':
+    resolution: {integrity: sha512-OMYB6gLpi6DJ4mcjQ0AJM7h2J9cT3R6DjllX+DtrNRHhJ9QeSkMOrkRuWuUDW+OmZdMUHCV/AVnv0nRkvl7HXQ==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-x64-musl@0.7.0-rc1':
+    resolution: {integrity: sha512-InTVBZpX3SEKA/0ReEwsdX8c5Jg5XuUgCM4K5Vh6bB25pgXxa+Tc/IT0LwzLBwSJ20Jl1DELi3W1VOC5F/+TNQ==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@myriaddreamin/typst-ts-node-compiler-win32-arm64-msvc@0.7.0-rc1':
+    resolution: {integrity: sha512-TKPMIk0nGZAhC5z5LocOfigYqBhw0IWZXinKUHLJ9POZUIdr/68F9KOBam2cjVya7HCgshjBSPJ9DDx0dSFyrQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@myriaddreamin/typst-ts-node-compiler-win32-x64-msvc@0.7.0-rc1':
+    resolution: {integrity: sha512-NuwuVyNWWSDbQXyhnMOZCp5fSI5mQT9/DESUB7lkLEqt+wH6x3EIpKq5dIyYPe7LDms4/xxz+aI0r/RgkXkgTA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [win32]
+
+  '@myriaddreamin/typst-ts-node-compiler@0.7.0-rc1':
+    resolution: {integrity: sha512-SKtuAXsQAhYOThDVj8jaWMKrVUcSumgOisGjlCChAQYGKQQQ3T0Ks6O34td8tPxBlaqfEzKRidNxYT+20yVKpA==}
+    engines: {node: '>= 10'}
 
   '@napi-rs/wasm-runtime@1.1.0':
     resolution: {integrity: sha512-Fq6DJW+Bb5jaWE69/qOE0D1TUN9+6uWhCeZpdnSBk14pjLcCWR7Q8n49PTSPHazM37JqrsdpEthXy2xn6jWWiA==}
@@ -795,6 +874,10 @@ packages:
     resolution: {integrity: sha512-d4lC8xfavMeBjzGr2vECC3fsGXziXZQyJxD868h2M/mBI3PwAuODxAkLkq5HYuvrPYcUtiLzsTo8U3PgX3Ocww==}
     engines: {node: '>=10.13.0'}
 
+  entities@6.0.1:
+    resolution: {integrity: sha512-aN97NXWF6AWBTahfVOIrB/NShkzi5H7F9r1s9mD3cDj4Ko5f2qhhVoYMibXF7GlLveb/D2ioWay8lxI97Ven3g==}
+    engines: {node: '>=0.12'}
+
   escalade@3.2.0:
     resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
     engines: {node: '>=6'}
@@ -936,6 +1019,18 @@ packages:
 
   hast-util-embedded@3.0.0:
     resolution: {integrity: sha512-naH8sld4Pe2ep03qqULEtvYr7EjrLK2QHY8KJR6RJkTUjPGObe1vnx585uzem2hGra+s1q08DZZpfgDVYRbaXA==}
+
+  hast-util-from-dom@5.0.1:
+    resolution: {integrity: sha512-N+LqofjR2zuzTjCPzyDUdSshy4Ma6li7p/c3pA78uTwzFgENbgbUrm2ugwsOdcjI1muO+o6Dgzp9p8WHtn/39Q==}
+
+  hast-util-from-html-isomorphic@2.0.0:
+    resolution: {integrity: sha512-zJfpXq44yff2hmE0XmwEOzdWin5xwH+QIhMLOScpX91e/NSGPsAzNCvLQDIEPyO2TXi+lBmU6hjLIhV8MwP2kw==}
+
+  hast-util-from-html@2.0.3:
+    resolution: {integrity: sha512-CUSRHXyKjzHov8yKsQjGOElXy/3EKpyX56ELnkHH34vDVw1N1XSQ1ZcAvTyAPtGqLTuKP/uxM+aLkSPqF/EtMw==}
+
+  hast-util-from-parse5@8.0.3:
+    resolution: {integrity: sha512-3kxEVkEKt0zvcZ3hCRYI8rqrgwtlIOFMWkbclACvjlDw8Li9S2hk/d51OI0nr/gIpdMHNepwgOKqZ/sy0Clpyg==}
 
   hast-util-from-selector@3.0.1:
     resolution: {integrity: sha512-CA2dwcsAS6a7DNZq8HT5fNP4FzUq2PUpQpKnAtOCmfTk429jR0RtasLSMlFA1FNKd8lgfeCIAFl3/vD95be8Lg==}
@@ -1349,6 +1444,9 @@ packages:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
 
+  parse5@7.3.0:
+    resolution: {integrity: sha512-IInvU7fabl34qmi9gY8XOVxhYyMyuH2xUNpb2q8/Y+7552KlejkRvqvD19nMoUW/uQGGbqNpA6Tufu5FL5BZgw==}
+
   path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
     engines: {node: '>=8'}
@@ -1658,6 +1756,9 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  vfile-location@5.0.3:
+    resolution: {integrity: sha512-5yXvWDEgqeiYiBe1lbxYF7UMAIm/IcopxMHrMQDq3nvKcjPKIhZklUKL+AE7J7uApI4kwe2snsK+eI6UTj9EHg==}
+
   vfile-message@4.0.3:
     resolution: {integrity: sha512-QTHzsGd1EhbZs4AsQ20JX1rC3cOlt/IWJruk893DfLRr57lcnOeMaWG4K0JrRta4mIJZKth2Au3mM3u03/JWKw==}
 
@@ -1703,6 +1804,9 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  web-namespaces@2.0.1:
+    resolution: {integrity: sha512-bKr1DkiNa2krS7qxNtdrtHAmzuYGFQLiQ13TsorsdT6ULTkPLKuu5+GsFpDlg6JFjUTwX2DyhMPG2be8uPrqsQ==}
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -1941,6 +2045,53 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@myriaddreamin/typst-ts-node-compiler-android-arm-eabi@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-android-arm64@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-darwin-arm64@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-darwin-x64@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-arm-gnueabihf@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-gnu@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-musl@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-x64-gnu@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-linux-x64-musl@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-win32-arm64-msvc@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler-win32-x64-msvc@0.7.0-rc1':
+    optional: true
+
+  '@myriaddreamin/typst-ts-node-compiler@0.7.0-rc1':
+    optionalDependencies:
+      '@myriaddreamin/typst-ts-node-compiler-android-arm-eabi': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-android-arm64': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-darwin-arm64': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-darwin-x64': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-linux-arm-gnueabihf': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-linux-arm64-gnu': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-linux-arm64-musl': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-linux-x64-gnu': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-linux-x64-musl': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-win32-arm64-msvc': 0.7.0-rc1
+      '@myriaddreamin/typst-ts-node-compiler-win32-x64-msvc': 0.7.0-rc1
 
   '@napi-rs/wasm-runtime@1.1.0':
     dependencies:
@@ -2389,6 +2540,8 @@ snapshots:
       graceful-fs: 4.2.11
       tapable: 2.3.0
 
+  entities@6.0.1: {}
+
   escalade@3.2.0: {}
 
   escape-string-regexp@4.0.0: {}
@@ -2533,6 +2686,39 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.4
       hast-util-is-element: 3.0.0
+
+  hast-util-from-dom@5.0.1:
+    dependencies:
+      '@types/hast': 3.0.4
+      hastscript: 9.0.1
+      web-namespaces: 2.0.1
+
+  hast-util-from-html-isomorphic@2.0.0:
+    dependencies:
+      '@types/hast': 3.0.4
+      hast-util-from-dom: 5.0.1
+      hast-util-from-html: 2.0.3
+      unist-util-remove-position: 5.0.0
+
+  hast-util-from-html@2.0.3:
+    dependencies:
+      '@types/hast': 3.0.4
+      devlop: 1.1.0
+      hast-util-from-parse5: 8.0.3
+      parse5: 7.3.0
+      vfile: 6.0.3
+      vfile-message: 4.0.3
+
+  hast-util-from-parse5@8.0.3:
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/unist': 3.0.3
+      devlop: 1.1.0
+      hastscript: 9.0.1
+      property-information: 7.1.0
+      vfile: 6.0.3
+      vfile-location: 5.0.3
+      web-namespaces: 2.0.1
 
   hast-util-from-selector@3.0.1:
     dependencies:
@@ -3158,6 +3344,10 @@ snapshots:
     dependencies:
       callsites: 3.1.0
 
+  parse5@7.3.0:
+    dependencies:
+      entities: 6.0.1
+
   path-exists@4.0.0: {}
 
   path-key@3.1.1: {}
@@ -3621,6 +3811,11 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
+  vfile-location@5.0.3:
+    dependencies:
+      '@types/unist': 3.0.3
+      vfile: 6.0.3
+
   vfile-message@4.0.3:
     dependencies:
       '@types/unist': 3.0.3
@@ -3644,6 +3839,8 @@ snapshots:
       '@types/node': 24.10.1
       fsevents: 2.3.3
       jiti: 2.6.1
+
+  web-namespaces@2.0.1: {}
 
   which@2.0.2:
     dependencies:

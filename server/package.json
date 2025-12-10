@@ -13,7 +13,9 @@
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
+    "@myriaddreamin/typst-ts-node-compiler": "0.7.0-rc1",
     "chokidar": "^5.0.0",
+    "hast-util-from-html-isomorphic": "^2.0.0",
     "mdgraph-client": "workspace:*",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-document": "^7.0.3",
@@ -29,6 +31,7 @@
     "string-width": "^8.1.0",
     "unified": "^11.0.5",
     "unist-util-find": "^3.0.0",
+    "unist-util-visit": "^5.0.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {

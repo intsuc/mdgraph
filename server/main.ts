@@ -2,7 +2,10 @@
 
 import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
+import { fromHtmlIsomorphic } from "hast-util-from-html-isomorphic"
+import { NodeCompiler as TypstCompiler } from "@myriaddreamin/typst-ts-node-compiler"
 import { unified, type Plugin, type Processor } from "unified"
+import { visit } from "unist-util-visit"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
@@ -20,7 +23,7 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
-import type { Node, Element } from "hast"
+import type { Element, ElementContent } from "hast"
 import url from "node:url"
 import z from "zod"
 
@@ -54,8 +57,42 @@ async function generateAssets({ out }: Config) {
   }
 }
 
+const typstCompiler = TypstCompiler.create()
+
+const rehypeTypst: Plugin = () => {
+  return (tree) => {
+    visit(tree, (node) => "tagName" in node && node.tagName === "code", (node) => {
+      const codeElement = node as Element
+      const codeClassNames = codeElement.properties.className
+      if (!Array.isArray(codeClassNames) || !codeClassNames.includes("language-math")) {
+        return
+      }
+      if (codeElement.children[0]?.type !== "text") {
+        return
+      }
+
+      const codeValue = codeElement.children[0].value
+      codeElement.tagName = "span"
+      try {
+        const typstResult = typstCompiler.compile({
+          mainFileContent: `
+#set page(height: auto, width: auto, margin: 0pt)
+$${codeValue}$
+`,
+        })
+        const svgValue = typstCompiler.svg(typstResult.result!)
+        const svgElement = fromHtmlIsomorphic(svgValue, { fragment: true }).children[0]! as ElementContent
+        codeElement.children = [svgElement]
+        codeElement.properties.style = "display: inline-block;"
+      } catch (e) {
+        codeElement.properties.style = "color: red;"
+      }
+    })
+  }
+}
+
 const wrapWithRoot: Plugin = () => {
-  return (tree: Node) => {
+  return (tree) => {
     return { type: "element", tagName: "div", properties: { id: "root" }, children: [tree] }
   }
 }
@@ -64,7 +101,7 @@ const eventSourceEndpoint = "/event"
 
 const injectAssets: (mode: "development" | "production", base: string) => Plugin = (mode, base) => () => {
   base = mode === "production" ? base : "/"
-  return (tree: Node) => {
+  return (tree) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
       { type: "element", tagName: "script", properties: { type: "module", src: `${base}index.js` }, children: [] },
@@ -105,6 +142,7 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(remarkMath)
     .use(remarkGfm, { stringLength: stringWidth })
     .use(remarkRehype)
+    .use(rehypeTypst)
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, { behavior: "wrap" })
     .use(wrapWithRoot)

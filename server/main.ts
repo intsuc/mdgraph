@@ -67,17 +67,21 @@ const rehypeTypst: Plugin = () => {
       if (!Array.isArray(codeClassNames) || !codeClassNames.includes("language-math")) {
         return
       }
+      delete codeElement.properties.className
       if (codeElement.children[0]?.type !== "text") {
         return
       }
       const codeValue = codeElement.children[0].value
 
       let targetElement: Element
+      let display: "block" | "inline"
       const parentElement = ancestors[ancestors.length - 1]! as Element
       if (parentElement.type === "element" && parentElement.tagName === "pre") {
+        display = "block"
         targetElement = parentElement
         targetElement.tagName = "div"
       } else {
+        display = "inline"
         targetElement = codeElement
         targetElement.tagName = "span"
       }
@@ -90,9 +94,13 @@ $${codeValue}$
 `,
         })
         const svgValue = typstCompiler.svg(typstResult.result!)
-        const svgElement = fromHtmlIsomorphic(svgValue, { fragment: true }).children[0]! as ElementContent
+        const svgElement = fromHtmlIsomorphic(svgValue, { fragment: true }).children[0]! as Element
+        const width = parseFloat(svgElement.properties.dataWidth as string)
+        const height = parseFloat(svgElement.properties.dataHeight as string)
+        svgElement.properties.width = `${width / 11}em`
+        svgElement.properties.height = `${height / 11}em`
         targetElement.children = [svgElement]
-        targetElement.properties.style = codeClassNames.includes("math-inline") ? "display: inline-block;" : undefined
+        targetElement.properties.style = display === "inline" ? "display: inline-block;" : "display: block;"
       } catch (e) {
         targetElement.properties.style = "color: red;"
       }

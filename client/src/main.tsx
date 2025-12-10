@@ -1,7 +1,6 @@
 import { StrictMode, useEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import "./index.css"
-import { FileMdIcon, GraphIcon, SparkleIcon, TranslateIcon } from "@phosphor-icons/react"
 
 const rootElement = document.getElementById("root")!
 const originalText = rootElement.innerText

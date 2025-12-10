@@ -3,6 +3,7 @@
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "target": "esnext",
+    "rootDir": "src",
     "erasableSyntaxOnly": true,
     "skipLibCheck": true,
     "strict": true,

@@ -1,7 +1,7 @@
 import { defineConfig } from "rolldown"
 
 export default defineConfig({
-  input: "main.ts",
+  input: "src/main.ts",
   platform: "node",
   tsconfig: true,
   output: {

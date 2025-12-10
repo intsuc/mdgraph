@@ -23,7 +23,7 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
-import type { Element, ElementContent } from "hast"
+import type { Element } from "hast"
 import url from "node:url"
 import z from "zod"
 
@@ -57,9 +57,8 @@ async function generateAssets({ out }: Config) {
   }
 }
 
-const typstCompiler = TypstCompiler.create()
-
 const rehypeTypst: Plugin = () => {
+  const typstCompiler = TypstCompiler.create()
   return (tree) => {
     visitParents(tree, (node) => "tagName" in node && node.tagName === "code", (node, ancestors) => {
       const codeElement = node as Element
@@ -135,21 +134,6 @@ const injectAssets: (mode: "development" | "production", base: string) => Plugin
   }
 }
 
-async function generate({ src, out }: Config, processor: Processor<any, any, any, any, any>, input: string, onGenerate?: (pathname: string) => void) {
-  const document = await fs.readFile(input, "utf8")
-  const file = await processor.process(document)
-
-  const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
-  const outPath = `${outPathWithoutExt}.html`
-  await fs.mkdir(path.dirname(outPath), { recursive: true })
-
-  await fs.copyFile(input, input.replace(src, out))
-  await fs.writeFile(outPath, String(file), "utf8")
-
-  const pathname = `/${path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")}`
-  onGenerate?.(pathname)
-}
-
 function createProcessor(mode: "development" | "production", base: string) {
   base = mode === "production" ? base : "/"
   return unified()
@@ -166,6 +150,21 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(injectAssets(mode, base))
     .use(rehypePresetMinify)
     .use(rehypeStringify)
+}
+
+async function generate({ src, out }: Config, processor: Processor<any, any, any, any, any>, input: string, onGenerate?: (pathname: string) => void) {
+  const document = await fs.readFile(input, "utf8")
+  const file = await processor.process(document)
+
+  const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
+  const outPath = `${outPathWithoutExt}.html`
+  await fs.mkdir(path.dirname(outPath), { recursive: true })
+
+  await fs.copyFile(input, input.replace(src, out))
+  await fs.writeFile(outPath, String(file), "utf8")
+
+  const pathname = `/${path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")}`
+  onGenerate?.(pathname)
 }
 
 async function init() {

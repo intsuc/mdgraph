@@ -31,7 +31,7 @@
     "string-width": "^8.1.0",
     "unified": "^11.0.5",
     "unist-util-find": "^3.0.0",
-    "unist-util-visit": "^5.0.0",
+    "unist-util-visit-parents": "^6.0.2",
     "zod": "^4.1.13"
   },
   "devDependencies": {

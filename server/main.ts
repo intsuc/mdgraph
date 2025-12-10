@@ -5,7 +5,7 @@ import { find } from "unist-util-find"
 import { fromHtmlIsomorphic } from "hast-util-from-html-isomorphic"
 import { NodeCompiler as TypstCompiler } from "@myriaddreamin/typst-ts-node-compiler"
 import { unified, type Plugin, type Processor } from "unified"
-import { visit } from "unist-util-visit"
+import { visitParents } from "unist-util-visit-parents"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
@@ -61,7 +61,7 @@ const typstCompiler = TypstCompiler.create()
 
 const rehypeTypst: Plugin = () => {
   return (tree) => {
-    visit(tree, (node) => "tagName" in node && node.tagName === "code", (node) => {
+    visitParents(tree, (node) => "tagName" in node && node.tagName === "code", (node, ancestors) => {
       const codeElement = node as Element
       const codeClassNames = codeElement.properties.className
       if (!Array.isArray(codeClassNames) || !codeClassNames.includes("language-math")) {
@@ -70,9 +70,18 @@ const rehypeTypst: Plugin = () => {
       if (codeElement.children[0]?.type !== "text") {
         return
       }
-
       const codeValue = codeElement.children[0].value
-      codeElement.tagName = "span"
+
+      let targetElement: Element
+      const parentElement = ancestors[ancestors.length - 1]! as Element
+      if (parentElement.type === "element" && parentElement.tagName === "pre") {
+        targetElement = parentElement
+        targetElement.tagName = "div"
+      } else {
+        targetElement = codeElement
+        targetElement.tagName = "span"
+      }
+
       try {
         const typstResult = typstCompiler.compile({
           mainFileContent: `
@@ -82,10 +91,10 @@ $${codeValue}$
         })
         const svgValue = typstCompiler.svg(typstResult.result!)
         const svgElement = fromHtmlIsomorphic(svgValue, { fragment: true }).children[0]! as ElementContent
-        codeElement.children = [svgElement]
-        codeElement.properties.style = "display: inline-block;"
+        targetElement.children = [svgElement]
+        targetElement.properties.style = codeClassNames.includes("math-inline") ? "display: inline-block;" : undefined
       } catch (e) {
-        codeElement.properties.style = "color: red;"
+        targetElement.properties.style = "color: red;"
       }
     })
   }

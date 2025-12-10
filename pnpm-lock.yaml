@@ -132,9 +132,9 @@ importers:
       unist-util-find:
         specifier: ^3.0.0
         version: 3.0.0
-      unist-util-visit:
-        specifier: ^5.0.0
-        version: 5.0.0
+      unist-util-visit-parents:
+        specifier: ^6.0.2
+        version: 6.0.2
       zod:
         specifier: ^4.1.13
         version: 4.1.13

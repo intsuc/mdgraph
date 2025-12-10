@@ -1,24 +1,25 @@
 import { Command } from "@commander-js/extra-typings"
-import { unified, type Plugin, type Processor } from "unified"
 import { find } from "unist-util-find"
+import { unified, type Plugin, type Processor } from "unified"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
 import http from "node:http"
 import path from "node:path"
-import url from "node:url"
-import rehypeDocument from "rehype-document"
-import rehypeSlug from "rehype-slug"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
+import rehypeDocument from "rehype-document"
 import rehypeMeta from "rehype-meta"
 import rehypePresetMinify from "rehype-preset-minify"
+import rehypeSlug from "rehype-slug"
 import rehypeStringify from "rehype-stringify"
 import remarkGfm from "remark-gfm"
+import remarkMath from "remark-math"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
 import type { Node, Element } from "hast"
+import url from "node:url"
 import z from "zod"
 
 const configSchema = z.object({
@@ -99,6 +100,7 @@ function createProcessor(mode: "development" | "production", base: string) {
   base = mode === "production" ? base : "/"
   return unified()
     .use(remarkParse)
+    .use(remarkMath)
     .use(remarkGfm, { stringLength: stringWidth })
     .use(remarkRehype)
     .use(rehypeSlug)

@@ -143,7 +143,7 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(remarkRehype)
     .use(rehypeTypst)
     .use(rehypeSlug)
-    .use(rehypeAutolinkHeadings, { behavior: "wrap" })
+    .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;"}, children: [{ type: "text", value: "#" }] }] })
     .use(wrapWithRoot)
     .use(rehypeDocument, { css: `${base}index.css` })
     .use(rehypeMeta, { og: true, type: "article" })

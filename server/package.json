@@ -5,10 +5,10 @@
   "main": "main.ts",
   "type": "module",
   "bin": {
-    "mdgraph": "dist/bundle.js"
+    "mdgraph": "main.ts"
   },
   "scripts": {
-    "build": "cd ../client && pnpm build && cd ../server && rolldown -c"
+    "build": "cd ../client && pnpm build"
   },
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
@@ -34,7 +34,6 @@
   "devDependencies": {
     "@types/hast": "^3.0.4",
     "@types/node": "^24.10.1",
-    "rolldown": "1.0.0-beta.53",
     "typescript": "^5.9.3"
   }
 }

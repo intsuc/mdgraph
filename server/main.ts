@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
 import { unified, type Plugin, type Processor } from "unified"

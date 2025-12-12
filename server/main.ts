@@ -4,7 +4,7 @@ import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
 import { fromHtmlIsomorphic } from "hast-util-from-html-isomorphic"
 import { NodeCompiler as TypstCompiler } from "@myriaddreamin/typst-ts-node-compiler"
-import { unified, type Plugin, type Processor } from "unified"
+import { unified, type Plugin } from "unified"
 import { visitParents } from "unist-util-visit-parents"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
@@ -33,6 +33,7 @@ const configSchema = z.object({
   out: z.string().default("out"),
   base: z.string().default("/"),
   port: z.number().default(3000),
+  languages: z.array(z.string()).min(1).default(["en"]),
 })
 
 type Config = z.infer<typeof configSchema>
@@ -105,15 +106,15 @@ $${codeValue}$
   }
 }
 
-const wrapWithRoot: Plugin = () => {
+const wrapWithRoot: Plugin<[Config]> = ({ languages }: Config) => {
   return (tree) => {
-    return { type: "element", tagName: "div", properties: { id: "root" }, children: [tree] }
+    return { type: "element", tagName: "div", properties: { id: "root", "data-languages": languages }, children: [tree] }
   }
 }
 
 const eventSourceEndpoint = "/event"
 
-const injectAssets: (mode: "development" | "production", base: string) => Plugin = (mode, base) => () => {
+const injectAssets: Plugin<[mode: "development" | "production", base: string]> = (mode, base) => {
   base = mode === "production" ? base : "/"
   return (tree) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
@@ -134,8 +135,8 @@ const injectAssets: (mode: "development" | "production", base: string) => Plugin
   }
 }
 
-function createProcessor(mode: "development" | "production", base: string) {
-  base = mode === "production" ? base : "/"
+function createProcessor(mode: "development" | "production", language: string, config: Config) {
+  const base = mode === "production" ? config.base : "/"
   return unified()
     .use(remarkParse)
     .use(remarkMath)
@@ -143,18 +144,27 @@ function createProcessor(mode: "development" | "production", base: string) {
     .use(remarkRehype)
     .use(rehypeTypst)
     .use(rehypeSlug)
-    .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;"}, children: [{ type: "text", value: "#" }] }] })
-    .use(wrapWithRoot)
-    .use(rehypeDocument, { css: `${base}index.css` })
+    .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
+    .use(wrapWithRoot, config)
+    .use(rehypeDocument, { css: `${base}index.css`, language })
     .use(rehypeMeta, { og: true, type: "article" })
-    .use(injectAssets(mode, base))
+    .use(injectAssets, mode, base)
     .use(rehypePresetMinify)
     .use(rehypeStringify)
 }
 
-async function generate({ src, out }: Config, processor: Processor<any, any, any, any, any>, input: string, onGenerate?: (pathname: string) => void) {
+function createProcessors(mode: "development" | "production", config: Config): Record<string, ReturnType<typeof createProcessor>> {
+  const processors: Record<string, ReturnType<typeof createProcessor>> = {}
+  for (const language of config.languages) {
+    processors[language] = createProcessor(mode, language, config)
+  }
+  return processors
+}
+
+async function generate({ src, out }: Config, processors: ReturnType<typeof createProcessors>, input: string, onGenerate?: (pathname: string) => void) {
   const document = await fs.readFile(input, "utf8")
-  const file = await processor.process(document)
+  const language = path.relative(src, input).split(path.sep)[0]!
+  const file = await processors[language]!.process(document)
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
   const outPath = `${outPathWithoutExt}.html`
@@ -184,10 +194,10 @@ async function init() {
 async function build(config: Config) {
   await generateAssets(config)
 
-  const processor = createProcessor("production", config.base)
+  const processors = createProcessors("production", config)
 
   for await (const input of fs.glob(path.join(config.src, "**/*.md"))) {
-    await generate(config, processor, input)
+    await generate(config, processors, input)
   }
 
   console.log("Build completed")
@@ -196,7 +206,7 @@ async function build(config: Config) {
 async function serve(config: Config) {
   await generateAssets(config)
 
-  const processor = createProcessor("development", config.base)
+  const processors = createProcessors("development", config)
 
   const clients: Record<string, http.ServerResponse> = {}
   function sendEventToAll(pathname: string) {
@@ -237,8 +247,8 @@ async function serve(config: Config) {
   })
 
   chokidar.watch(config.src)
-    .on("add", (path) => void generate(config, processor, path, sendEventToAll))
-    .on("change", (path) => void generate(config, processor, path, sendEventToAll))
+    .on("add", (path) => void generate(config, processors, path, sendEventToAll))
+    .on("change", (path) => void generate(config, processors, path, sendEventToAll))
 }
 
 const program = new Command()

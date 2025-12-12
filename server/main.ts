@@ -46,7 +46,9 @@ async function getConfig(): Promise<Config> {
   }
 }
 
-async function generateAssets({ out }: Config) {
+type Assets = { js: string, css: string }
+
+async function generateAssets({ out }: Config): Promise<Assets> {
   const assetsUrl = import.meta.resolve("mdgraph-client/dist/assets")
   const assetsPath = url.fileURLToPath(assetsUrl)
   await fs.mkdir(out, { recursive: true })
@@ -55,6 +57,10 @@ async function generateAssets({ out }: Config) {
     const srcPath = path.join(assetsPath, file)
     const outPath = path.join(out, file)
     await fs.copyFile(srcPath, outPath)
+  }
+  return {
+    js: files.find((file) => file.endsWith(".js"))!,
+    css: files.find((file) => file.endsWith(".css"))!,
   }
 }
 
@@ -106,7 +112,8 @@ $${codeValue}$
   }
 }
 
-const wrapWithRoot: Plugin<[Config]> = ({ base, languages }: Config) => {
+const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode, { base, languages }: Config) => {
+  base = mode === "production" ? base : "/"
   return (tree) => {
     return {
       type: "element", tagName: "div", properties: {
@@ -120,12 +127,12 @@ const wrapWithRoot: Plugin<[Config]> = ({ base, languages }: Config) => {
 
 const eventSourceEndpoint = "/event"
 
-const injectAssets: Plugin<[mode: "development" | "production", base: string]> = (mode, base) => {
+const injectAssets: Plugin<[mode: "development" | "production", base: string, js: string]> = (mode, base, js) => {
   base = mode === "production" ? base : "/"
   return (tree) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
-      { type: "element", tagName: "script", properties: { type: "module", src: `${base}index.js` }, children: [] },
+      { type: "element", tagName: "script", properties: { type: "module", src: `${base}${js}` }, children: [] },
     )
 
     if (mode === "development") {
@@ -141,7 +148,7 @@ const injectAssets: Plugin<[mode: "development" | "production", base: string]> =
   }
 }
 
-function createProcessor(mode: "development" | "production", language: string, config: Config) {
+function createProcessor(mode: "development" | "production", assets: Assets, language: string, config: Config) {
   const base = mode === "production" ? config.base : "/"
   return unified()
     .use(remarkParse)
@@ -151,18 +158,18 @@ function createProcessor(mode: "development" | "production", language: string, c
     .use(rehypeTypst)
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
-    .use(wrapWithRoot, config)
-    .use(rehypeDocument, { css: `${base}index.css`, language })
+    .use(wrapWithRoot, mode, config)
+    .use(rehypeDocument, { css: `${base}${assets.css}`, language })
     .use(rehypeMeta, { og: true, type: "article" })
-    .use(injectAssets, mode, base)
+    .use(injectAssets, mode, base, assets.js)
     .use(rehypePresetMinify)
     .use(rehypeStringify)
 }
 
-function createProcessors(mode: "development" | "production", config: Config): Record<string, ReturnType<typeof createProcessor>> {
+function createProcessors(mode: "development" | "production", assets: Assets, config: Config): Record<string, ReturnType<typeof createProcessor>> {
   const processors: Record<string, ReturnType<typeof createProcessor>> = {}
   for (const language of config.languages) {
-    processors[language] = createProcessor(mode, language, config)
+    processors[language] = createProcessor(mode, assets, language, config)
   }
   return processors
 }
@@ -198,9 +205,9 @@ async function init() {
 }
 
 async function build(config: Config) {
-  await generateAssets(config)
+  const assets = await generateAssets(config)
 
-  const processors = createProcessors("production", config)
+  const processors = createProcessors("production", assets, config)
 
   for await (const input of fs.glob(path.join(config.src, "**/*.md"))) {
     await generate(config, processors, input)
@@ -210,9 +217,9 @@ async function build(config: Config) {
 }
 
 async function serve(config: Config) {
-  await generateAssets(config)
+  const assets = await generateAssets(config)
 
-  const processors = createProcessors("development", config)
+  const processors = createProcessors("development", assets, config)
 
   const clients: Record<string, http.ServerResponse> = {}
   function sendEventToAll(pathname: string) {

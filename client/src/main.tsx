@@ -22,47 +22,6 @@ const originalHtml = rootElement.innerHTML
 
 const markdownPathname = `${location.pathname}${location.pathname.endsWith("/") ? "index" : ""}.md`
 
-// async function summarize(text: string): Promise<ReadableStream<string> | undefined> {
-//   if (!("Summarizer" in window)) { return undefined }
-//
-//   const options: SummarizerCreateCoreOptions = {
-//     type: "tldr",
-//     format: "plain-text",
-//     outputLanguage: navigator.language,
-//   }
-//   const availability = await Summarizer.availability(options)
-//   if (availability === "unavailable") { return undefined }
-//
-//   if (navigator.userActivation.isActive) {
-//     const summarizer = await Summarizer.create(options)
-//     return summarizer.summarizeStreaming(text)
-//   }
-// }
-//
-// async function checkTranslatorAvailability(text: string): Promise<TranslatorCreateCoreOptions | undefined> {
-//   if (!("LanguageDetector" in window)) { return undefined }
-//   if (!("Translator" in window)) { return undefined }
-//
-//   const detector = await LanguageDetector.create()
-//   const result = (await detector.detect(text))[0]
-//   if (result === undefined) { return undefined }
-//
-//   const { detectedLanguage: sourceLanguage } = result
-//   if (sourceLanguage === undefined) { return undefined }
-//   const targetLanguage = navigator.language
-//
-//   const availability = await Translator.availability({ sourceLanguage, targetLanguage })
-//   if (availability === "unavailable") { return undefined }
-//
-//   return { sourceLanguage, targetLanguage }
-// }
-//
-// async function translate(text: string, options: TranslatorCreateCoreOptions): Promise<string | undefined> {
-//   const translator = await Translator.create(options)
-//   const translatedText = await translator.translate(text)
-//   return translatedText
-// }
-
 function Document() {
   return (
     <div>

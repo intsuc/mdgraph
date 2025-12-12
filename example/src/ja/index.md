@@ -32,6 +32,8 @@
 
 インラインコード: `npm install`。
 
+ハイライト付きインラインコード: `const sum = (a: number, b: number): number => a + b;{:ts}`。
+
 フェンス付きコードブロック:
 
 ```bash

@@ -15,6 +15,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeDocument from "rehype-document"
 import rehypeMeta from "rehype-meta"
 import rehypePresetMinify from "rehype-preset-minify"
+import rehypeShiki from "@shikijs/rehype"
 import rehypeSlug from "rehype-slug"
 import rehypeStringify from "rehype-stringify"
 import remarkGfm from "remark-gfm"
@@ -156,6 +157,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(remarkGfm, { stringLength: stringWidth })
     .use(remarkRehype)
     .use(rehypeTypst)
+    .use(rehypeShiki, { inline: "tailing-curly-colon", themes: { light: "vitesse-light", dark: "vitesse-dark" } })
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
     .use(wrapWithRoot, mode, config)

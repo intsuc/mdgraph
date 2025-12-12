@@ -32,6 +32,8 @@ An inline image:
 
 Inline code: `npm install`.
 
+Inline code with highlight: `const sum = (a: number, b: number): number => a + b;{:ts}`.
+
 Fenced code blocks:
 
 ```bash

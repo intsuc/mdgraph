@@ -127,7 +127,7 @@ const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode
         {
           type: "element", tagName: "div", properties: {
             id: "main",
-            className: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert",
+            className: "mx-auto mt-13 px-4 py-8 prose prose-zinc dark:prose-invert",
           }, children: [tree]
         },
       ],

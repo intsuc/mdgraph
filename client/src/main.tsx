@@ -20,13 +20,15 @@ function processLanguage(id: string): { id: string, displayName: string, pathnam
 
 const currentLanguage = processLanguage(document.documentElement.lang)
 const availableLanguages = rootElement.dataset.languages!.split(" ").map(processLanguage)
-const originalHtml = rootElement.innerHTML
+
+const mainElement = document.getElementById("main")!
+const mainHtml = mainElement.innerHTML
 
 const markdownPathname = `${location.pathname}${location.pathname.endsWith("/") ? "index" : ""}.md`
 
 function Document() {
   return (
-    <div>
+    <>
       <div className="p-2 sticky top-0 flex gap-2 justify-end bg-background">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -81,9 +83,9 @@ function Document() {
       </div>
       <div
         className="mx-auto px-4 py-8 prose prose-zinc dark:prose-invert"
-        dangerouslySetInnerHTML={{ __html: originalHtml }}
+        dangerouslySetInnerHTML={{ __html: mainHtml }}
       />
-    </div>
+    </>
   )
 }
 

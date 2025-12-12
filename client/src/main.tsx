@@ -4,6 +4,8 @@ import "./index.css"
 import { LanguagesIcon, FileDownIcon, PictureInPictureIcon, ChevronDownIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ThemeProvider } from "./components/theme-provider"
+import { ModeToggle } from "./components/mode-toggle"
 
 const rootElement = document.getElementById("root")!
 const base = rootElement.dataset.base!
@@ -75,9 +77,10 @@ function Document() {
             <FileDownIcon size={24} />
           </a>
         </Button>
+        <ModeToggle />
       </div>
       <div
-        className="mx-auto px-4 py-8 prose prose-zinc"
+        className="mx-auto px-4 py-8 prose prose-zinc dark:prose-invert"
         dangerouslySetInnerHTML={{ __html: originalHtml }}
       />
     </div>
@@ -86,6 +89,8 @@ function Document() {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <Document />
+    <ThemeProvider storageKey="ui-theme">
+      <Document />
+    </ThemeProvider>
   </StrictMode>,
 )

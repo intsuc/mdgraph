@@ -17,7 +17,6 @@
     "@shikijs/rehype": "^3.20.0",
     "chokidar": "^5.0.0",
     "hast-util-from-html-isomorphic": "^2.0.0",
-    "mdgraph-client": "workspace:*",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-document": "^7.0.3",
     "rehype-meta": "^4.0.1",

@@ -114,9 +114,6 @@ importers:
       hast-util-from-html-isomorphic:
         specifier: ^2.0.0
         version: 2.0.0
-      mdgraph-client:
-        specifier: workspace:*
-        version: link:../client
       rehype-autolink-headings:
         specifier: ^7.1.0
         version: 7.1.0

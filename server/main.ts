@@ -50,7 +50,7 @@ async function getConfig(): Promise<Config> {
 type Assets = { js: string, css: string }
 
 async function generateAssets({ out }: Config): Promise<Assets> {
-  const assetsUrl = import.meta.resolve("mdgraph-client/dist/assets")
+  const assetsUrl = import.meta.resolve("./dist/assets/")
   const assetsPath = url.fileURLToPath(assetsUrl)
   await fs.mkdir(out, { recursive: true })
   const files = await fs.readdir(assetsPath)

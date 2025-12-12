@@ -13,4 +13,7 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  build: {
+    outDir: "../server/dist",
+  },
 })

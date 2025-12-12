@@ -106,9 +106,15 @@ $${codeValue}$
   }
 }
 
-const wrapWithRoot: Plugin<[Config]> = ({ languages }: Config) => {
+const wrapWithRoot: Plugin<[Config]> = ({ base, languages }: Config) => {
   return (tree) => {
-    return { type: "element", tagName: "div", properties: { id: "root", "data-languages": languages }, children: [tree] }
+    return {
+      type: "element", tagName: "div", properties: {
+        id: "root",
+        "data-base": base,
+        "data-languages": languages,
+      }, children: [tree]
+    }
   }
 }
 

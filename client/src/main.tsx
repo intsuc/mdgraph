@@ -5,15 +5,17 @@ import { LanguagesIcon, FileDownIcon, PictureInPictureIcon, ChevronDownIcon } fr
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
+const rootElement = document.getElementById("root")!
+const base = rootElement.dataset.base!
+
 function processLanguage(id: string): { id: string, displayName: string, pathname: string } {
   return {
     id,
     displayName: new Intl.DisplayNames(id, { type: "language" }).of(id)!,
-    pathname: `/${id}${location.pathname.substring(location.pathname.indexOf("/", 1))}`,
+    pathname: `${base}${id}${location.pathname.substring(location.pathname.indexOf("/", base.length))}`,
   }
 }
 
-const rootElement = document.getElementById("root")!
 const currentLanguage = processLanguage(document.documentElement.lang)
 const availableLanguages = rootElement.dataset.languages!.split(" ").map(processLanguage)
 const originalHtml = rootElement.innerHTML

@@ -25,7 +25,7 @@ const markdownPathname = `${location.pathname}${location.pathname.endsWith("/") 
 function Document() {
   return (
     <div>
-      <div className="p-2 sticky top-0 flex gap-2 justify-end border-b border-zinc-200 bg-white">
+      <div className="p-2 sticky top-0 flex gap-2 justify-end bg-background">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">

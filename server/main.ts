@@ -137,12 +137,14 @@ const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode
 
 const eventSourceEndpoint = "/event"
 
-const injectAssets: Plugin<[mode: "development" | "production", base: string, js: string]> = (mode, base, js) => {
+const injectAssets: Plugin<[mode: "development" | "production", base: string, assets: Assets]> = (mode, base, assets) => {
   base = mode === "production" ? base : "/"
   return (tree) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
-      { type: "element", tagName: "script", properties: { type: "module", src: `${base}${js}` }, children: [] },
+      { type: "element", tagName: "script", properties: { type: "module" }, children: [{ type: "text", value: `try{document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")}catch(e){}` }] },
+      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: `${base}${assets.css}` }, children: [] },
+      { type: "element", tagName: "script", properties: { type: "module", src: `${base}${assets.js}` }, children: [] },
     )
 
     if (mode === "development") {
@@ -170,9 +172,9 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
     .use(wrapWithRoot, mode, config)
-    .use(rehypeDocument, { css: `${base}${assets.css}`, language })
+    .use(rehypeDocument, { language })
     .use(rehypeMeta, { og: true, type: "article" })
-    .use(injectAssets, mode, base, assets.js)
+    .use(injectAssets, mode, base, assets)
     .use(rehypePresetMinify)
     .use(rehypeStringify)
 }

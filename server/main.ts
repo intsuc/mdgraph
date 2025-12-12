@@ -3,7 +3,6 @@
 import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
 import { fromHtmlIsomorphic } from "hast-util-from-html-isomorphic"
-import { NodeCompiler as TypstCompiler } from "@myriaddreamin/typst-ts-node-compiler"
 import { unified, type Plugin } from "unified"
 import { visitParents } from "unist-util-visit-parents"
 import chokidar from "chokidar"
@@ -13,6 +12,7 @@ import http from "node:http"
 import path from "node:path"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeDocument from "rehype-document"
+import rehypeMathjax from "rehype-mathjax"
 import rehypeMeta from "rehype-meta"
 import rehypePresetMinify from "rehype-preset-minify"
 import rehypeShiki from "@shikijs/rehype"
@@ -65,6 +65,7 @@ async function generateAssets({ out }: Config): Promise<Assets> {
   }
 }
 
+/*
 const rehypeTypst: Plugin = () => {
   const typstCompiler = TypstCompiler.create()
   return (tree) => {
@@ -112,6 +113,7 @@ $${codeValue}$
     })
   }
 }
+*/
 
 const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode, { base, languages }: Config) => {
   base = mode === "production" ? base : "/"
@@ -156,7 +158,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(remarkMath)
     .use(remarkGfm, { stringLength: stringWidth })
     .use(remarkRehype)
-    .use(rehypeTypst)
+    .use(rehypeMathjax)
     .use(rehypeShiki, { inline: "tailing-curly-colon", themes: { light: "vitesse-light", dark: "vitesse-dark" } })
     .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })

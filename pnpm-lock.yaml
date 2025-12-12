@@ -102,9 +102,6 @@ importers:
       '@commander-js/extra-typings':
         specifier: ^14.0.0
         version: 14.0.0(commander@14.0.2)
-      '@myriaddreamin/typst-ts-node-compiler':
-        specifier: 0.7.0-rc1
-        version: 0.7.0-rc1
       '@shikijs/rehype':
         specifier: ^3.20.0
         version: 3.20.0
@@ -120,6 +117,9 @@ importers:
       rehype-document:
         specifier: ^7.0.3
         version: 7.0.3
+      rehype-mathjax:
+        specifier: ^7.1.0
+        version: 7.1.0
       rehype-meta:
         specifier: ^4.0.1
         version: 4.0.1
@@ -356,76 +356,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@myriaddreamin/typst-ts-node-compiler-android-arm-eabi@0.7.0-rc1':
-    resolution: {integrity: sha512-RCQIrcvEow+n5FZRBUDBgXFJEH23/l2sm4ODsAVKDuyT0HARfHHJtxjbnYriVF4oLp3q2n9Vst/DkbOGczzHiQ==}
-    engines: {node: '>= 10'}
-    cpu: [arm]
-    os: [android]
-
-  '@myriaddreamin/typst-ts-node-compiler-android-arm64@0.7.0-rc1':
-    resolution: {integrity: sha512-CGnwtw2KAP5VoKrqjHAy7setrPMm4mtUmqDCbQih7wyBIvL4al6lGK6zJIoRamLqFBX+eLAuBQcEcT6kTrvP4w==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [android]
-
-  '@myriaddreamin/typst-ts-node-compiler-darwin-arm64@0.7.0-rc1':
-    resolution: {integrity: sha512-iE9jJY7X9Dbyf5ONhAlqIAo1hLA6cDj0VMjmdTRjzLWoCEhDqQQk37yUZbyRkCvqtSM7zqGz4QXsvphx7Qg1yg==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@myriaddreamin/typst-ts-node-compiler-darwin-x64@0.7.0-rc1':
-    resolution: {integrity: sha512-DLu8yZCLSJQFvzHh9Kjd4ZzNazEYv/J6wOVZPiTgWv7GncOj0C6KLjIfemNhSHbXeoXwiBvo81CCXt5d2BinwA==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-arm-gnueabihf@0.7.0-rc1':
-    resolution: {integrity: sha512-C110dpw0UG0O6bN2ASK4aQUnprT1NU5gRSUHQ3GcmiyrY2doD/6Mhy/rhYdgQ/jx/XahrZON+iFIDNm17rqbfg==}
-    engines: {node: '>= 10'}
-    cpu: [arm]
-    os: [linux]
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-gnu@0.7.0-rc1':
-    resolution: {integrity: sha512-TwlYVhyvpXgG06S/iABKLKEHekQAjjwgs3TUd6mbvGb+K+B8BQcOIPZlixoViUBPCKKr2HpEJTaFrC8NPJ+UNw==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [linux]
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-musl@0.7.0-rc1':
-    resolution: {integrity: sha512-ka4BXZSDvbTMLQ/4IxsWUzAyOJrAmMKAg1ZbEGHwVBwSY+etRyH8nSKAu3tKKTd5Ncf/Vr20fj5sHj+SCgENHA==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [linux]
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-x64-gnu@0.7.0-rc1':
-    resolution: {integrity: sha512-OMYB6gLpi6DJ4mcjQ0AJM7h2J9cT3R6DjllX+DtrNRHhJ9QeSkMOrkRuWuUDW+OmZdMUHCV/AVnv0nRkvl7HXQ==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [linux]
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-x64-musl@0.7.0-rc1':
-    resolution: {integrity: sha512-InTVBZpX3SEKA/0ReEwsdX8c5Jg5XuUgCM4K5Vh6bB25pgXxa+Tc/IT0LwzLBwSJ20Jl1DELi3W1VOC5F/+TNQ==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [linux]
-
-  '@myriaddreamin/typst-ts-node-compiler-win32-arm64-msvc@0.7.0-rc1':
-    resolution: {integrity: sha512-TKPMIk0nGZAhC5z5LocOfigYqBhw0IWZXinKUHLJ9POZUIdr/68F9KOBam2cjVya7HCgshjBSPJ9DDx0dSFyrQ==}
-    engines: {node: '>= 10'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@myriaddreamin/typst-ts-node-compiler-win32-x64-msvc@0.7.0-rc1':
-    resolution: {integrity: sha512-NuwuVyNWWSDbQXyhnMOZCp5fSI5mQT9/DESUB7lkLEqt+wH6x3EIpKq5dIyYPe7LDms4/xxz+aI0r/RgkXkgTA==}
-    engines: {node: '>= 10'}
-    cpu: [x64]
-    os: [win32]
-
-  '@myriaddreamin/typst-ts-node-compiler@0.7.0-rc1':
-    resolution: {integrity: sha512-SKtuAXsQAhYOThDVj8jaWMKrVUcSumgOisGjlCChAQYGKQQQ3T0Ks6O34td8tPxBlaqfEzKRidNxYT+20yVKpA==}
-    engines: {node: '>= 10'}
 
   '@napi-rs/wasm-runtime@1.1.0':
     resolution: {integrity: sha512-Fq6DJW+Bb5jaWE69/qOE0D1TUN9+6uWhCeZpdnSBk14pjLcCWR7Q8n49PTSPHazM37JqrsdpEthXy2xn6jWWiA==}
@@ -973,6 +903,9 @@ packages:
   '@types/katex@0.16.7':
     resolution: {integrity: sha512-HMwFiRujE5PjrgwHQ25+bsLJgowjGjm5Z8FVSf0N6PwgJrwxH0QxzHYDcKsTfV3wva0vzrpqMTJS2jXPr5BMEQ==}
 
+  '@types/mathjax@0.0.40':
+    resolution: {integrity: sha512-rHusx08LCg92WJxrsM3SPjvLTSvK5C+gealtSuhKbEOcUZfWlwigaFoPLf6Dfxhg4oryN5qP9Sj7zOQ4HYXINw==}
+
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
 
@@ -1060,6 +993,10 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: 8.0.0-beta.1
+
+  '@xmldom/xmldom@0.9.8':
+    resolution: {integrity: sha512-p96FSY54r+WJ50FIOsCOjyj/wavs8921hG5+kVMmZgKcvIKxMXHTrjNJvRgWa/zuX3B6t2lijLNFaOyuxUH+2A==}
+    engines: {node: '>=14.6'}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1175,6 +1112,10 @@ packages:
 
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
+
+  commander@13.1.0:
+    resolution: {integrity: sha512-/rFeCpNJQbhSZjGVwO9RFV3xPqbnERS8MmIQzCtD/zl6gpJuV/bMLuN92oG3F7d8oDEHHRrujSXNUr8fpjntKw==}
+    engines: {node: '>=18'}
 
   commander@14.0.2:
     resolution: {integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==}
@@ -1293,6 +1234,10 @@ packages:
     peerDependenciesMeta:
       jiti:
         optional: true
+
+  esm@3.2.25:
+    resolution: {integrity: sha512-U1suiZ2oDVWv4zPO56S0NcR5QriEahGtdN2OR6FiOG4WJvcjBVFB0qI4+eKoWFH483PKGuLuu6V8Z4T5g63UVA==}
+    engines: {node: '>=6'}
 
   espree@10.4.0:
     resolution: {integrity: sha512-j6PAQ2uUr79PZhBjP5C5fhl8e39FmRnOjsD5lGnWrFU8i2G776tBK7+nP8KuQUTTyAZUwfQqXAgrVH5MbH9CYQ==}
@@ -1451,6 +1396,9 @@ packages:
 
   hast-util-to-string@3.0.1:
     resolution: {integrity: sha512-XelQVTDWvqcl3axRfI0xSeoVKzyIFPwsAGSLIsKdJKQMXDYJS4WYrBNF/8J7RdhIcFI2BOHgAifggsvsxp/3+A==}
+
+  hast-util-to-text@4.0.2:
+    resolution: {integrity: sha512-KK6y/BN8lbaq654j7JgBydev7wuNMcID54lkRav1P0CaE1e47P72AWWPiGKXTJU271ooYzcvTAn/Zt0REnvc7A==}
 
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
@@ -1654,6 +1602,10 @@ packages:
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
 
+  mathjax-full@3.2.2:
+    resolution: {integrity: sha512-+LfG9Fik+OuI8SLwsiR02IVdjcnRCy5MufYLi0C3TdMT56L/pjB0alMVGgoWJF8pN9Rc7FESycZB9BMNWIid5w==}
+    deprecated: Version 4 replaces this package with the scoped package @mathjax/src
+
   mdast-util-find-and-replace@3.0.2:
     resolution: {integrity: sha512-Tmd1Vg/m3Xz43afeNxDIhWRtFZgM2VLyaf4vSTYwudTyeuTneoL3qtWMA5jeLyz/O1vDJmmV4QuScFCA2tBPwg==}
 
@@ -1692,6 +1644,9 @@ packages:
 
   mdast-util-to-string@4.0.0:
     resolution: {integrity: sha512-0H44vDimn51F0YwvxSJSm0eCDOJTRlmN0R1yBh4HLj9wiV1Dn0QoXGbvFAWj2hSItVTlCmBF1hqKlIyUBVFLPg==}
+
+  mhchemparser@4.2.1:
+    resolution: {integrity: sha512-kYmyrCirqJf3zZ9t/0wGgRZ4/ZJw//VwaRVGA75C4nhE60vtnIzhl9J9ndkX/h6hxSN7pjg/cE0VxbnNM+bnDQ==}
 
   micromark-core-commonmark@2.0.3:
     resolution: {integrity: sha512-RDBrHEMSxVFLg6xvnXmb1Ayr2WzLAWjeSATAoxwKYJV94TeNavgoIdA0a9ytzDSVzBy2YKFK+emCPOEibLeCrg==}
@@ -1786,6 +1741,9 @@ packages:
   minimatch@9.0.5:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
     engines: {node: '>=16 || 14 >=14.17'}
+
+  mj-context-menu@0.6.1:
+    resolution: {integrity: sha512-7NO5s6n10TIV96d4g2uDpG7ZDpIhMh0QNfGdJw/W47JswFcosz457wqz/b5sAKvl12sxINGFCn80NZHKwxQEXA==}
 
   mrmime@2.0.1:
     resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
@@ -1932,6 +1890,9 @@ packages:
   rehype-document@7.0.3:
     resolution: {integrity: sha512-g5zq6i2FwWVBVdyVi0Jw/5MRvsHj3wuJCn+QeyOjm29QBpTG4r1iUElyH9GhfWx5fB27ZEApA53RdAiYGBb4zQ==}
 
+  rehype-mathjax@7.1.0:
+    resolution: {integrity: sha512-mJHNpoqCC5UZ24OKx0wNjlzV18qeJz/Q/LtEjxXzt8vqrZ1Z3GxQnVrHcF5/PogcXUK8cWwJ4U/LWOQWEiABHw==}
+
   rehype-meta@4.0.1:
     resolution: {integrity: sha512-nLwA17+GbtBYi3C1KSrFR8JlqXv76mz185U//xDEAYgzE3g/bSD6WKSXva1W95ttzouUCJwA09X3AQZIi3R+Nw==}
 
@@ -2075,6 +2036,10 @@ packages:
   space-separated-tokens@2.0.2:
     resolution: {integrity: sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q==}
 
+  speech-rule-engine@4.1.2:
+    resolution: {integrity: sha512-S6ji+flMEga+1QU79NDbwZ8Ivf0S/MpupQQiIC0rTpU/ZTKgcajijJJb1OcByBQDjrXCN1/DJtGz4ZJeBMPGJw==}
+    hasBin: true
+
   string-width@8.1.0:
     resolution: {integrity: sha512-Kxl3KJGb/gxkaUMOjRsQ8IrXiGW75O4E3RPjFIINOVH8AMl2SQ/yWdTzWwF3FevIX9LcMAjJW+GRwAlAbTSXdg==}
     engines: {node: '>=20'}
@@ -2166,6 +2131,9 @@ packages:
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
+
+  unist-util-find-after@5.0.0:
+    resolution: {integrity: sha512-amQa0Ep2m6hE2g72AugUItjbuM8X8cGQnFoHk0pGfrFeT9GZhzN5SW8nRsiGKK7Aif4CrACPENkA6P/Lw6fHGQ==}
 
   unist-util-find@3.0.0:
     resolution: {integrity: sha512-T7ZqS7immLjYyC4FCp2hDo3ksZ1v+qcbb+e5+iWxc2jONgHOLXPCpms1L8VV4hVxCXgWTxmBHDztuEZFVwC+Gg==}
@@ -2284,6 +2252,9 @@ packages:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
     engines: {node: '>= 8'}
     hasBin: true
+
+  wicked-good-xpath@1.3.0:
+    resolution: {integrity: sha512-Gd9+TUn5nXdwj/hFsPVx5cuHHiF5Bwuc30jZ4+ronF1qHK5O7HD0sgmXWSEgwKquT3ClLoKPVbO6qGwVwLzvAw==}
 
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
@@ -2534,53 +2505,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@myriaddreamin/typst-ts-node-compiler-android-arm-eabi@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-android-arm64@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-darwin-arm64@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-darwin-x64@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-arm-gnueabihf@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-gnu@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-arm64-musl@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-x64-gnu@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-linux-x64-musl@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-win32-arm64-msvc@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler-win32-x64-msvc@0.7.0-rc1':
-    optional: true
-
-  '@myriaddreamin/typst-ts-node-compiler@0.7.0-rc1':
-    optionalDependencies:
-      '@myriaddreamin/typst-ts-node-compiler-android-arm-eabi': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-android-arm64': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-darwin-arm64': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-darwin-x64': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-linux-arm-gnueabihf': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-linux-arm64-gnu': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-linux-arm64-musl': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-linux-x64-gnu': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-linux-x64-musl': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-win32-arm64-msvc': 0.7.0-rc1
-      '@myriaddreamin/typst-ts-node-compiler-win32-x64-msvc': 0.7.0-rc1
 
   '@napi-rs/wasm-runtime@1.1.0':
     dependencies:
@@ -3060,6 +2984,8 @@ snapshots:
 
   '@types/katex@0.16.7': {}
 
+  '@types/mathjax@0.0.40': {}
+
   '@types/mdast@4.0.4':
     dependencies:
       '@types/unist': 3.0.3
@@ -3185,6 +3111,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@xmldom/xmldom@0.9.8': {}
+
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
       acorn: 8.15.0
@@ -3292,6 +3220,8 @@ snapshots:
   color-name@1.1.4: {}
 
   comma-separated-tokens@2.0.3: {}
+
+  commander@13.1.0: {}
 
   commander@14.0.2: {}
 
@@ -3414,6 +3344,8 @@ snapshots:
       jiti: 2.6.1
     transitivePeerDependencies:
       - supports-color
+
+  esm@3.2.25: {}
 
   espree@10.4.0:
     dependencies:
@@ -3616,6 +3548,13 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.4
 
+  hast-util-to-text@4.0.2:
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/unist': 3.0.3
+      hast-util-is-element: 3.0.0
+      unist-util-find-after: 5.0.0
+
   hast-util-whitespace@3.0.0:
     dependencies:
       '@types/hast': 3.0.4
@@ -3782,6 +3721,13 @@ snapshots:
 
   markdown-table@3.0.4: {}
 
+  mathjax-full@3.2.2:
+    dependencies:
+      esm: 3.2.25
+      mhchemparser: 4.2.1
+      mj-context-menu: 0.6.1
+      speech-rule-engine: 4.1.2
+
   mdast-util-find-and-replace@3.0.2:
     dependencies:
       '@types/mdast': 4.0.4
@@ -3907,6 +3853,8 @@ snapshots:
   mdast-util-to-string@4.0.0:
     dependencies:
       '@types/mdast': 4.0.4
+
+  mhchemparser@4.2.1: {}
 
   micromark-core-commonmark@2.0.3:
     dependencies:
@@ -4117,6 +4065,8 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.2
 
+  mj-context-menu@0.6.1: {}
+
   mrmime@2.0.1: {}
 
   ms@2.1.3: {}
@@ -4253,6 +4203,17 @@ snapshots:
       '@types/hast': 3.0.4
       hastscript: 8.0.0
       unified: 11.0.5
+      vfile: 6.0.3
+
+  rehype-mathjax@7.1.0:
+    dependencies:
+      '@types/hast': 3.0.4
+      '@types/mathjax': 0.0.40
+      hast-util-to-text: 4.0.2
+      hastscript: 9.0.1
+      mathjax-full: 3.2.2
+      unified: 11.0.5
+      unist-util-visit-parents: 6.0.2
       vfile: 6.0.3
 
   rehype-meta@4.0.1:
@@ -4556,6 +4517,12 @@ snapshots:
 
   space-separated-tokens@2.0.2: {}
 
+  speech-rule-engine@4.1.2:
+    dependencies:
+      '@xmldom/xmldom': 0.9.8
+      commander: 13.1.0
+      wicked-good-xpath: 1.3.0
+
   string-width@8.1.0:
     dependencies:
       get-east-asian-width: 1.4.0
@@ -4635,6 +4602,11 @@ snapshots:
       is-plain-obj: 4.1.0
       trough: 2.2.0
       vfile: 6.0.3
+
+  unist-util-find-after@5.0.0:
+    dependencies:
+      '@types/unist': 3.0.3
+      unist-util-is: 6.0.1
 
   unist-util-find@3.0.0:
     dependencies:
@@ -4742,6 +4714,8 @@ snapshots:
   which@2.0.2:
     dependencies:
       isexe: 2.0.0
+
+  wicked-good-xpath@1.3.0: {}
 
   word-wrap@1.2.5: {}
 

@@ -10,6 +10,7 @@ import http from "node:http"
 import path from "node:path"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeDocument from "rehype-document"
+import rehypeInferTitleMeta from "rehype-infer-title-meta"
 import rehypeMathjax from "rehype-mathjax"
 import rehypeMeta from "rehype-meta"
 import rehypePresetMinify from "rehype-preset-minify"
@@ -121,6 +122,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeMathjax)
     .use(rehypeShiki, { inline: "tailing-curly-colon", themes: { light: "vitesse-light", dark: "vitesse-dark" } })
     .use(rehypeSlug)
+    .use(rehypeInferTitleMeta)
     .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
     .use(wrapWithRoot, mode, config)
     .use(rehypeDocument, { language })

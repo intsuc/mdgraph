@@ -1,5 +1,5 @@
 import { StrictMode } from "react"
-import { createRoot } from "react-dom/client"
+import { hydrateRoot } from "react-dom/client"
 import "./index.css"
 import { LanguagesIcon, FileDownIcon, PictureInPictureIcon, ChevronDownIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -7,9 +7,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { ThemeProvider } from "./components/theme-provider"
 import { ModeToggle } from "./components/mode-toggle"
 
-const rootElement = document.getElementById("root")!
-const base = rootElement.dataset.base!
+const headerElement = document.getElementById("header")!
 
+const base = headerElement.dataset.base!
 function processLanguage(id: string): { id: string, displayName: string, pathname: string } {
   return {
     id,
@@ -19,17 +19,14 @@ function processLanguage(id: string): { id: string, displayName: string, pathnam
 }
 
 const currentLanguage = processLanguage(document.documentElement.lang)
-const availableLanguages = rootElement.dataset.languages!.split(" ").map(processLanguage)
-
-const mainElement = document.getElementById("main")!
-const mainHtml = mainElement.innerHTML
+const availableLanguages = headerElement.dataset.languages!.split(" ").map(processLanguage)
 
 const markdownPathname = `${location.pathname}${location.pathname.endsWith("/") ? "index" : ""}.md`
 
-function Document() {
+function Header() {
   return (
-    <>
-      <div className="p-2 sticky top-0 flex gap-2 justify-end bg-background">
+    <StrictMode>
+      <ThemeProvider storageKey="ui-theme">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
@@ -80,19 +77,9 @@ function Document() {
           </a>
         </Button>
         <ModeToggle />
-      </div>
-      <div
-        className="mx-auto px-4 py-8 prose prose-zinc dark:prose-invert"
-        dangerouslySetInnerHTML={{ __html: mainHtml }}
-      />
-    </>
+      </ThemeProvider>
+    </StrictMode>
   )
 }
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <ThemeProvider storageKey="ui-theme">
-      <Document />
-    </ThemeProvider>
-  </StrictMode>,
-)
+hydrateRoot(headerElement, <Header />).render(<Header />)

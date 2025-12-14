@@ -76,15 +76,31 @@ const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode
       }, children: [
         {
           type: "element", tagName: "div", properties: {
-            id: "header",
-            className: "p-2 h-13 sticky top-0 flex gap-2 justify-end bg-background",
-          }, children: []
-        },
-        {
-          type: "element", tagName: "div", properties: {
-            id: "main",
-            className: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert",
-          }, children: [tree]
+            className: "flex w-full",
+          }, children: [
+            {
+              type: "element", tagName: "div", properties: {
+                className: "min-w-[16rem] h-screen bg-sidebar",
+              }, children: [],
+            },
+            {
+              type: "element", tagName: "main", properties: {
+                className: "w-full",
+              }, children: [
+                {
+                  type: "element", tagName: "div", properties: {
+                    className: "p-2 h-13 sticky top-0 flex gap-2 justify-end bg-background",
+                  }, children: []
+                },
+                {
+                  type: "element", tagName: "div", properties: {
+                    id: "main",
+                    className: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert",
+                  }, children: [tree]
+                },
+              ],
+            },
+          ],
         },
       ],
     }
@@ -98,6 +114,7 @@ const injectAssets: Plugin<[mode: "development" | "production", base: string, as
   return (tree) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
+      // TODO: load sidebar_state and set class accordingly
       { type: "element", tagName: "script", properties: { type: "module" }, children: [{ type: "text", value: `try{document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")}catch(e){}` }] },
       { type: "element", tagName: "link", properties: { rel: "stylesheet", href: `${base}${assets.css}` }, children: [] },
       { type: "element", tagName: "script", properties: { type: "module", src: `${base}${assets.js}` }, children: [] },
@@ -126,7 +143,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeMathjax)
     .use(rehypeShiki, { inline: "tailing-curly-colon", themes: { light: "vitesse-light", dark: "vitesse-dark" } })
     .use(rehypeSlug)
-    .use(rehypeToc, { headings: ["h1", "h2", "h3"] })
+    .use(rehypeToc, { headings: ["h1", "h2", "h3"], cssClasses: { toc: "hidden" } })
     .use(rehypeInferTitleMeta)
     .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
     .use(wrapWithRoot, mode, config)

@@ -1,5 +1,5 @@
 import { StrictMode } from "react"
-import { hydrateRoot } from "react-dom/client"
+import { createRoot } from "react-dom/client"
 import "./index.css"
 import { LanguagesIcon, FileDownIcon, PictureInPictureIcon, ChevronDownIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -82,4 +82,4 @@ function Header() {
   )
 }
 
-hydrateRoot(headerElement, <Header />).render(<Header />)
+createRoot(headerElement).render(<Header />)

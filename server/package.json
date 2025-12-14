@@ -13,6 +13,7 @@
   "packageManager": "pnpm@10.25.0",
   "dependencies": {
     "@commander-js/extra-typings": "^14.0.0",
+    "@jsdevtools/rehype-toc": "^3.0.2",
     "@shikijs/rehype": "^3.20.0",
     "chokidar": "^5.0.0",
     "hast-util-from-html-isomorphic": "^2.0.0",

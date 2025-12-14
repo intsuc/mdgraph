@@ -2,6 +2,7 @@
 
 import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
+import { toc as rehypeToc } from "@jsdevtools/rehype-toc"
 import { unified, type Plugin } from "unified"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
@@ -68,17 +69,20 @@ const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode
   base = mode === "production" ? base : "/"
   return (tree) => {
     return {
-      type: "element", tagName: "div", properties: {}, children: [
+      type: "element", tagName: "div", properties: {
+        id: "root",
+        "data-base": base,
+        "data-languages": languages,
+      }, children: [
         {
           type: "element", tagName: "div", properties: {
             id: "header",
             className: "p-2 h-13 sticky top-0 flex gap-2 justify-end bg-background",
-            "data-base": base,
-            "data-languages": languages,
           }, children: []
         },
         {
           type: "element", tagName: "div", properties: {
+            id: "main",
             className: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert",
           }, children: [tree]
         },
@@ -122,6 +126,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeMathjax)
     .use(rehypeShiki, { inline: "tailing-curly-colon", themes: { light: "vitesse-light", dark: "vitesse-dark" } })
     .use(rehypeSlug)
+    .use(rehypeToc, { headings: ["h1", "h2", "h3"] })
     .use(rehypeInferTitleMeta)
     .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
     .use(wrapWithRoot, mode, config)

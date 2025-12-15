@@ -71,8 +71,8 @@ const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode
   return (tree) => {
     return h("div#root", { "data-base": base, "data-languages": languages }, [
       h("div", { class: "flex w-full" }, [
-        h("div", { class: "min-w-[16rem] h-screen bg-sidebar" }),
-        h("main", { class: "w-full" }, [
+        h("div", { class: "w-(--sidebar-width) h-screen bg-sidebar" }),
+        h("main", { class: "flex-1" }, [
           h("div", { class: "p-2 h-13 sticky top-0 flex gap-2 justify-end bg-background" }),
           h("div#main", { class: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert" }, [tree as Element]),
         ]),
@@ -88,15 +88,28 @@ const injectAssets: Plugin<[mode: "development" | "production", base: string, as
   return (tree) => {
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
-      // TODO: load sidebar_state and set class accordingly
-      h("script", { type: "module" }, `try{document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")}catch(e){}`),
+      h("script", { type: "module" }, `
+try{
+  document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
+  document.getElementById("root").style.setProperty("--sidebar-width", localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem")
+} catch (e) {
+}
+`),
       h("link", { rel: "stylesheet", href: `${base}${assets.css}` }),
       h("script", { type: "module", src: `${base}${assets.js}` }),
     )
 
     if (mode === "development") {
       headNode.children.push(
-        h("script", { type: "module" }, `(()=>{new EventSource("${eventSourceEndpoint}").onmessage=(e)=>{if(e.data===location.pathname){location.reload()}}})()`),
+        h("script", { type: "module" }, `
+(() => {
+  new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
+    if (e.data === location.pathname) {
+      location.reload()
+    }
+  }
+})()
+`),
       )
     }
   }

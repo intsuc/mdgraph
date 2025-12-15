@@ -76,7 +76,7 @@ function Toc({ item }: { item: TocItem }) {
 
 function Document() {
   const [defaultOpen] = useState(() => {
-    const sidebarState = localStorage.getItem("sidebar_state")
+    const sidebarState = localStorage.getItem("sidebar-state")
     switch (sidebarState) {
       case "expanded": return true
       case "collapsed": return false

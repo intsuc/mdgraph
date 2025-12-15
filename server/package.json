@@ -17,6 +17,7 @@
     "@shikijs/rehype": "^3.20.0",
     "chokidar": "^5.0.0",
     "hast-util-from-html-isomorphic": "^2.0.0",
+    "hastscript": "^9.0.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-document": "^7.0.3",
     "rehype-infer-title-meta": "^2.0.0",

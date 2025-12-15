@@ -4,6 +4,7 @@ import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
 import { toc as rehypeToc } from "@jsdevtools/rehype-toc"
 import { unified, type Plugin } from "unified"
+import { h } from "hastscript"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
@@ -68,42 +69,15 @@ async function generateAssets({ out }: Config): Promise<Assets> {
 const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode, { base, languages }: Config) => {
   base = mode === "production" ? base : "/"
   return (tree) => {
-    return {
-      type: "element", tagName: "div", properties: {
-        id: "root",
-        "data-base": base,
-        "data-languages": languages,
-      }, children: [
-        {
-          type: "element", tagName: "div", properties: {
-            className: "flex w-full",
-          }, children: [
-            {
-              type: "element", tagName: "div", properties: {
-                className: "min-w-[16rem] h-screen bg-sidebar",
-              }, children: [],
-            },
-            {
-              type: "element", tagName: "main", properties: {
-                className: "w-full",
-              }, children: [
-                {
-                  type: "element", tagName: "div", properties: {
-                    className: "p-2 h-13 sticky top-0 flex gap-2 justify-end bg-background",
-                  }, children: []
-                },
-                {
-                  type: "element", tagName: "div", properties: {
-                    id: "main",
-                    className: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert",
-                  }, children: [tree]
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    }
+    return h("div#root", { "data-base": base, "data-languages": languages }, [
+      h("div", { class: "flex w-full" }, [
+        h("div", { class: "min-w-[16rem] h-screen bg-sidebar" }),
+        h("main", { class: "w-full" }, [
+          h("div", { class: "p-2 h-13 sticky top-0 flex gap-2 justify-end bg-background" }),
+          h("div#main", { class: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert" }, [tree as Element]),
+        ]),
+      ]),
+    ])
   }
 }
 
@@ -115,20 +89,15 @@ const injectAssets: Plugin<[mode: "development" | "production", base: string, as
     const headNode = find<Element>(tree, { tagName: "head" })!
     headNode.children.push(
       // TODO: load sidebar_state and set class accordingly
-      { type: "element", tagName: "script", properties: { type: "module" }, children: [{ type: "text", value: `try{document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")}catch(e){}` }] },
-      { type: "element", tagName: "link", properties: { rel: "stylesheet", href: `${base}${assets.css}` }, children: [] },
-      { type: "element", tagName: "script", properties: { type: "module", src: `${base}${assets.js}` }, children: [] },
+      h("script", { type: "module" }, `try{document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")}catch(e){}`),
+      h("link", { rel: "stylesheet", href: `${base}${assets.css}` }),
+      h("script", { type: "module", src: `${base}${assets.js}` }),
     )
 
     if (mode === "development") {
-      headNode.children.push({
-        type: "element", tagName: "script", properties: { type: "module" }, children: [
-          {
-            type: "text",
-            value: `(()=>{new EventSource("${eventSourceEndpoint}").onmessage=(e)=>{if(e.data===location.pathname){location.reload()}}})()`,
-          },
-        ],
-      })
+      headNode.children.push(
+        h("script", { type: "module" }, `(()=>{new EventSource("${eventSourceEndpoint}").onmessage=(e)=>{if(e.data===location.pathname){location.reload()}}})()`),
+      )
     }
   }
 }
@@ -145,7 +114,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeSlug)
     .use(rehypeToc, { headings: ["h1", "h2", "h3"], cssClasses: { toc: "hidden" } })
     .use(rehypeInferTitleMeta)
-    .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [{ type: "element", tagName: "span", properties: { style: "margin-right: 0.25em;" }, children: [{ type: "text", value: "#" }] }] })
+    .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [h("span", { style: "margin-right: 0.25em;" }, "#")] })
     .use(wrapWithRoot, mode, config)
     .use(rehypeDocument, { language })
     .use(rehypeMeta, { og: true, type: "article" })

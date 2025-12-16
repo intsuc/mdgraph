@@ -2,9 +2,9 @@
 
 import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
+import { h } from "hastscript"
 import { toc as rehypeToc } from "@jsdevtools/rehype-toc"
 import { unified, type Plugin } from "unified"
-import { h } from "hastscript"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
@@ -36,6 +36,7 @@ const configSchema = z.object({
   base: z.string().default("/"),
   port: z.number().default(3000),
   languages: z.array(z.string()).min(1).default(["en"]),
+  defaultLanguage: z.string().default("en"),
 })
 
 type Config = z.infer<typeof configSchema>
@@ -136,6 +137,11 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeStringify)
 }
 
+const redirectProcessor = unified()
+  .use(rehypeDocument)
+  .use(rehypePresetMinify)
+  .use(rehypeStringify)
+
 function createProcessors(mode: "development" | "production", assets: Assets, config: Config): Record<string, ReturnType<typeof createProcessor>> {
   const processors: Record<string, ReturnType<typeof createProcessor>> = {}
   for (const language of config.languages) {
@@ -144,9 +150,10 @@ function createProcessors(mode: "development" | "production", assets: Assets, co
   return processors
 }
 
-async function generate({ src, out }: Config, processors: ReturnType<typeof createProcessors>, input: string, onGenerate?: (pathname: string) => void) {
+async function generate({ src, out, defaultLanguage }: Config, processors: ReturnType<typeof createProcessors>, input: string, onGenerate?: (pathname: string) => void) {
   const document = await fs.readFile(input, "utf8")
-  const language = path.relative(src, input).split(path.sep)[0]!
+  const parts = path.relative(src, input).split(path.sep)
+  const language = parts[0]!
   const file = await processors[language]!.process(document)
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
@@ -156,8 +163,23 @@ async function generate({ src, out }: Config, processors: ReturnType<typeof crea
   await fs.copyFile(input, input.replace(src, out))
   await fs.writeFile(outPath, String(file), "utf8")
 
-  const pathname = `/${path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")}`
-  onGenerate?.(pathname)
+  const pathname = path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")
+
+  if (language === defaultLanguage) {
+    const string = redirectProcessor.stringify({
+      type: "root",
+      children: [h("html", [
+        h("head", [
+          h("link", { rel: "canonical", href: `/${path.relative(out, outPath).replace(/\\/g, "/")}` }),
+          h("meta", { httpEquiv: "refresh", content: `0;url=${pathname}` }),
+        ])
+      ])],
+    })
+    const redirectOutPath = path.join(out, path.relative(path.join(src, defaultLanguage), input).replace(/\.md$/, ".html"))
+    await fs.writeFile(redirectOutPath, string, "utf8")
+  }
+
+  onGenerate?.(`/${pathname}`)
 }
 
 async function init() {

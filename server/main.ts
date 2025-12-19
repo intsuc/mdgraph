@@ -92,7 +92,10 @@ const injectAssets: Plugin<[mode: "development" | "production", base: string, as
       h("script", { type: "module" }, `
 try{
   document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
-  document.getElementById("root").style.setProperty("--sidebar-width", localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem")
+  document.getElementById("root").style.setProperty(
+    "--sidebar-width",
+    window.innerWidth < 768 || localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem",
+  )
 } catch (e) {
 }
 `),

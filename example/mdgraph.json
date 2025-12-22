@@ -2,6 +2,10 @@
   "$schema": "./.mdgraph/schema.json",
   "src": "src",
   "syntaxes": "syntaxes",
+  "themes": {
+    "light": "vitesse-light",
+    "dark": "vitesse-dark"
+  },
   "out": "out",
   "base": "/mdgraph/",
   "port": 3000,

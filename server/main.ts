@@ -34,6 +34,13 @@ const configSchema = z.object({
   $schema: z.string().default("./.mdgraph/schema.json"),
   src: z.string().default("src"),
   syntaxes: z.string().default("syntaxes"),
+  themes: z.object({
+    light: z.string().default("vitesse-light"),
+    dark: z.string().default("vitesse-dark"),
+  }).default({
+    light: "vitesse-light",
+    dark: "vitesse-dark",
+  }),
   out: z.string().default("out"),
   base: z.string().default("/"),
   port: z.number().default(3000),
@@ -133,7 +140,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeMathjax)
     .use(rehypeShiki, {
       inline: "tailing-curly-colon",
-      themes: { light: "vitesse-light", dark: "vitesse-dark" },
+      themes: config.themes,
       langs,
     })
     .use(rehypeSlug)

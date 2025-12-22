@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "test",
+  "scopeName": "source.test",
+  "patterns": [
+    {
+      "match": "#.*$",
+      "name": "comment.line.test"
+    },
+    {
+      "match": "-?[0-9]+\\b",
+      "name": "constant.numeric.test"
+    },
+    {
+      "match": "\\b[a-z0-9-]+\\b",
+      "name": "variable.test"
+    }
+  ]
+}

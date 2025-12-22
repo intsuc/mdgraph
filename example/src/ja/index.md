@@ -32,18 +32,14 @@
 
 インラインコード: `npm install`。
 
-ハイライト付きインラインコード: `const sum = (a: number, b: number): number => a + b;{:ts}`。
+ハイライト付きインラインコード: `f 0{:test}`。
 
 フェンス付きコードブロック:
 
-```bash
-echo "Hello from bash"
-```
-
-```typescript
-function add(a: number, b: number): number {
-  return a + b;
-}
+```test
+# comment
+foo
+-42
 ```
 
 ## 表

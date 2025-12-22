@@ -32,18 +32,14 @@ An inline image:
 
 Inline code: `npm install`.
 
-Inline code with highlight: `const sum = (a: number, b: number): number => a + b;{:ts}`.
+Inline code with highlight: `f 0{:test}`.
 
-Fenced code blocks:
+Fenced code block:
 
-```bash
-echo "Hello from bash"
-```
-
-```typescript
-function add(a: number, b: number): number {
-  return a + b;
-}
+```test
+# comment
+foo
+-42
 ```
 
 ## Tables

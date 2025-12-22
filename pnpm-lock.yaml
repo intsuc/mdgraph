@@ -178,6 +178,9 @@ importers:
         specifier: ^4.1.13
         version: 4.1.13
     devDependencies:
+      '@shikijs/types':
+        specifier: ^3.20.0
+        version: 3.20.0
       '@types/hast':
         specifier: ^3.0.4
         version: 3.0.4

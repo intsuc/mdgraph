@@ -26,12 +26,14 @@ import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
 import type { Element } from "hast"
+import type { LanguageInput } from "@shikijs/types"
 import url from "node:url"
 import z from "zod"
 
 const configSchema = z.object({
   $schema: z.string().default("./.mdgraph/schema.json"),
   src: z.string().default("src"),
+  syntaxes: z.string().default("syntaxes"),
   out: z.string().default("out"),
   base: z.string().default("/"),
   port: z.number().default(3000),
@@ -119,22 +121,37 @@ try{
   }
 }
 
-function createProcessor(mode: "development" | "production", assets: Assets, language: string, config: Config) {
+function createProcessor(mode: "development" | "production", assets: Assets, language: string, langs: LanguageInput[], config: Config) {
   const base = mode === "production" ? config.base : "/"
   return unified()
     .use(remarkParse)
     .use(remarkMath)
-    .use(remarkGfm, { stringLength: stringWidth })
+    .use(remarkGfm, {
+      stringLength: stringWidth,
+    })
     .use(remarkRehype)
     .use(rehypeMathjax)
-    .use(rehypeShiki, { inline: "tailing-curly-colon", themes: { light: "vitesse-light", dark: "vitesse-dark" } })
+    .use(rehypeShiki, {
+      inline: "tailing-curly-colon",
+      themes: { light: "vitesse-light", dark: "vitesse-dark" },
+      langs,
+    })
     .use(rehypeSlug)
-    .use(rehypeToc, { headings: ["h1", "h2", "h3"], cssClasses: { toc: "hidden" } })
+    .use(rehypeToc, {
+      headings: ["h1", "h2", "h3"],
+      cssClasses: { toc: "hidden" },
+    })
     .use(rehypeInferTitleMeta)
-    .use(rehypeAutolinkHeadings, { behavior: "prepend", content: [h("span", { style: "margin-right: 0.25em;" }, "#")] })
+    .use(rehypeAutolinkHeadings, {
+      behavior: "prepend",
+      content: [h("span", { style: "margin-right: 0.25em;" }, "#")],
+    })
     .use(wrapWithRoot, mode, config)
     .use(rehypeDocument, { language })
-    .use(rehypeMeta, { og: true, type: "article" })
+    .use(rehypeMeta, {
+      og: true,
+      type: "article",
+    })
     .use(injectAssets, mode, base, assets)
     .use(rehypePresetMinify)
     .use(rehypeStringify)
@@ -145,15 +162,21 @@ const redirectProcessor = unified()
   .use(rehypePresetMinify)
   .use(rehypeStringify)
 
-function createProcessors(mode: "development" | "production", assets: Assets, config: Config): Record<string, ReturnType<typeof createProcessor>> {
+async function createProcessors(mode: "development" | "production", assets: Assets, config: Config): Promise<Record<string, ReturnType<typeof createProcessor>>> {
+  const files = await fs.readdir(config.syntaxes)
+  const langs: LanguageInput[] = await Promise.all(files.map(async (file) => {
+    // TODO: validate
+    return JSON.parse(await fs.readFile(path.join(config.syntaxes, file), "utf8"))
+  }))
+
   const processors: Record<string, ReturnType<typeof createProcessor>> = {}
   for (const language of config.languages) {
-    processors[language] = createProcessor(mode, assets, language, config)
+    processors[language] = createProcessor(mode, assets, language, langs, config)
   }
   return processors
 }
 
-async function generate({ src, out, defaultLanguage }: Config, processors: ReturnType<typeof createProcessors>, input: string, onGenerate?: (pathname: string) => void) {
+async function generate({ src, out, defaultLanguage }: Config, processors: Awaited<ReturnType<typeof createProcessors>>, input: string, onGenerate?: (pathname: string) => void) {
   const document = await fs.readFile(input, "utf8")
   const parts = path.relative(src, input).split(path.sep)
   const language = parts[0]!
@@ -202,7 +225,7 @@ async function init() {
 async function build(config: Config) {
   const assets = await generateAssets(config)
 
-  const processors = createProcessors("production", assets, config)
+  const processors = await createProcessors("production", assets, config)
 
   for await (const input of fs.glob(path.join(config.src, "**/*.md"))) {
     await generate(config, processors, input)
@@ -214,7 +237,7 @@ async function build(config: Config) {
 async function serve(config: Config) {
   const assets = await generateAssets(config)
 
-  const processors = createProcessors("development", assets, config)
+  const processors = await createProcessors("development", assets, config)
 
   const clients: Record<string, http.ServerResponse> = {}
   function sendEventToAll(pathname: string) {

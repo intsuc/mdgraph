@@ -1,10 +1,10 @@
-#!/usr/bin/env node
-
 import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
 import { h } from "hastscript"
+import { prerenderToNodeStream } from "react-dom/static"
 import { toc as rehypeToc } from "@jsdevtools/rehype-toc"
 import { unified, type Plugin } from "unified"
+import App from "./App"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
 import fs from "node:fs/promises"
@@ -27,6 +27,7 @@ import sirv from "sirv"
 import stringWidth from "string-width"
 import type { Element } from "hast"
 import type { LanguageInput } from "@shikijs/types"
+import type { ReactNode } from "react"
 import url from "node:url"
 import z from "zod"
 
@@ -335,3 +336,31 @@ program
   })
 
 program.parse(process.argv)
+
+// async function renderToString(bootstrapModule: string, reactNode: ReactNode): Promise<string> {
+//   const { prelude } = await prerenderToNodeStream(reactNode, {
+//     bootstrapModules: [bootstrapModule],
+//   })
+//
+//   return new Promise((resolve, reject) => {
+//     let data = ""
+//     prelude.on("data", chunk => {
+//       data += chunk
+//     })
+//     prelude.on("end", () => resolve(data))
+//     prelude.on("error", reject)
+//   })
+// }
+//
+// const manifest = JSON.parse(await fs.readFile("dist/client/.vite/manifest.json", "utf8"))
+// const js = manifest["index.html"].file as string
+// const css = manifest["index.html"].css[0] as string
+// const string = await renderToString(js, <App css={css} />)
+//
+// await fs.rm("dist/all", { recursive: true, force: true })
+// await fs.mkdir("dist/all", { recursive: true })
+// await fs.writeFile("dist/all/index.html", string)
+//
+// await fs.mkdir("dist/all/assets", { recursive: true })
+// await fs.copyFile("dist/client/" + js, "dist/all/" + js)
+// await fs.copyFile("dist/client/" + css, "dist/all/" + css)

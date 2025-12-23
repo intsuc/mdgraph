@@ -1,5 +1,6 @@
 import { Command } from "@commander-js/extra-typings"
 import { find } from "unist-util-find"
+import { Fragment, jsx, jsxs } from "react/jsx-runtime"
 import { h } from "hastscript"
 import { prerenderToNodeStream } from "react-dom/static"
 import { toc as rehypeToc } from "@jsdevtools/rehype-toc"
@@ -26,12 +27,20 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
-import type hast from "hast"
 import type { LanguageInput } from "@shikijs/types"
 import type { ReactNode } from "react"
+import type hast from "hast"
 import url from "node:url"
 import z from "zod"
-import { Fragment, jsx, jsxs } from "react/jsx-runtime"
+
+// @ts-ignore
+globalThis.localStorage = {
+  getItem(key: string): string | null {
+    return null
+  },
+  setItem(key: string, value: string): void {
+  },
+}
 
 const configSchema = z.object({
   $schema: z.string().default("./.mdgraph/schema.json"),
@@ -87,6 +96,13 @@ async function generateAssets({ out }: Config): Promise<Assets> {
   return {
     js: files.find((file) => file.endsWith(".js"))!,
     css: files.find((file) => file.endsWith(".css"))!,
+  }
+}
+
+const wrap: Plugin<[mode: "development" | "production", Config]> = (mode, { base, languages }: Config) => {
+  base = mode === "production" ? base : "/"
+  return (tree: hast.Root) => {
+    return h("div#main", { class: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert" }, [tree])
   }
 }
 
@@ -152,13 +168,14 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
       behavior: "prepend",
       content: [h("span", { style: "margin-right: 0.25em;" }, "#")],
     })
-    .use(rehypeDocument, { language })
-    .use(rehypeMeta, {
-      og: true,
-      type: "article",
-    })
-    .use(injectAssets, mode, base, assets)
+    .use(wrap, mode, config)
     .use(rehypeReact, { Fragment, jsx, jsxs })
+  // .use(rehypeDocument, { language })
+  // .use(rehypeMeta, {
+  //   og: true,
+  //   type: "article",
+  // })
+  // .use(injectAssets, mode, base, assets)
   // .use(rehypePresetMinify)
   // .use(rehypeStringify)
 }
@@ -177,27 +194,15 @@ async function createProcessors(mode: "development" | "production", assets: Asse
   return processors
 }
 
-async function renderToString(mode: "development" | "production", bootstrapModule: string, reactNode: ReactNode): Promise<string> {
-  const { prelude } = await prerenderToNodeStream(reactNode, {
-    //     bootstrapScriptContent: `
-    // try{
-    //   document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
-    //   document.getElementById("root").style.setProperty(
-    //     "--sidebar-width",
-    //     window.innerWidth < 768 || localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem",
-    //   )
-    // } catch (e) {
-    // }
-    // ${mode === "development" ? `
-    // new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
-    //   if (e.data === location.pathname) {
-    //     location.reload()
-    //   }
-    // }
-    // ` : ""}
-    // `,
-    //     bootstrapModules: [bootstrapModule],
-  })
+async function renderToString(assets: Assets, reactNode: ReactNode): Promise<string> {
+  const { prelude } = await prerenderToNodeStream(
+    <Document
+      js={`/${assets.js}`}
+      css={`/${assets.css}`}
+    >
+      {reactNode}
+    </Document>
+  )
 
   return new Promise((resolve, reject) => {
     let data = ""
@@ -207,12 +212,12 @@ async function renderToString(mode: "development" | "production", bootstrapModul
   })
 }
 
-async function generate(mode: "development" | "production", { src, out, defaultLanguage }: Config, processors: Awaited<ReturnType<typeof createProcessors>>, input: string, onGenerate?: (pathname: string) => void) {
+async function generate(mode: "development" | "production", assets: Assets, { src, out, defaultLanguage }: Config, processors: Awaited<ReturnType<typeof createProcessors>>, input: string, onGenerate?: (pathname: string) => void) {
   const document = await fs.readFile(input, "utf8")
   const parts = path.relative(src, input).split(path.sep)
   const language = parts[0]!
   const file = await processors[language]!.process(document)
-  const string = await renderToString(mode, "todo", file.result)
+  const string = await renderToString(assets, file.result)
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
   const outPath = `${outPathWithoutExt}.html`
@@ -264,7 +269,7 @@ async function build(config: Config) {
   const processors = await createProcessors("production", assets, config)
 
   for await (const input of fs.glob(path.join(config.src, "**/*.md"))) {
-    await generate("production", config, processors, input)
+    await generate("production", assets, config, processors, input)
   }
 
   console.log("Build completed")
@@ -320,8 +325,8 @@ async function serve(config: Config) {
   })
 
   chokidar.watch(config.src)
-    .on("add", (path) => void generate("development", config, processors, path, sendEventToAll))
-    .on("change", (path) => void generate("development", config, processors, path, sendEventToAll))
+    .on("add", (path) => void generate("development", assets, config, processors, path, sendEventToAll))
+    .on("change", (path) => void generate("development", assets, config, processors, path, sendEventToAll))
 }
 
 const program = new Command()

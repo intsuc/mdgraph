@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import "./index.css"
 import { PictureInPictureIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -6,7 +6,15 @@ import { ThemeProvider } from "./components/theme-provider"
 import { ModeToggle } from "./components/mode-toggle"
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarInset, SidebarMenu, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
 
-export default function Document({ css }: { css?: string }) {
+export default function Document({
+  js,
+  css,
+  children,
+}: {
+  js?: string,
+  css?: string,
+  children?: ReactNode,
+}) {
   const [defaultOpen] = useState(() => {
     const sidebarState = localStorage.getItem("sidebar-state")
     switch (sidebarState) {
@@ -22,7 +30,8 @@ export default function Document({ css }: { css?: string }) {
         <head>
           <meta charSet="utf-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="stylesheet" href={css}></link>
+          {css && <link rel="stylesheet" href={css} />}
+          {js && <script type="module" src={js}></script>}
         </head>
         <body>
           <SidebarProvider defaultOpen={defaultOpen}>
@@ -43,7 +52,6 @@ export default function Document({ css }: { css?: string }) {
                   <SidebarTrigger />
                 </div>
                 <div className="flex gap-2">
-
                   <Button
                     variant="outline"
                     size="icon"
@@ -59,9 +67,7 @@ export default function Document({ css }: { css?: string }) {
                   <ModeToggle />
                 </div>
               </div>
-              <div
-                className="mx-auto px-4 py-8 prose prose-zinc dark:prose-invert"
-              />
+              {children}
             </SidebarInset>
           </SidebarProvider>
         </body>

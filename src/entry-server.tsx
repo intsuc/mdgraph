@@ -147,11 +147,18 @@ async function createProcessors(config: Config): Promise<Record<string, ReturnTy
   return processors
 }
 
-async function renderToString(mode: "development" | "production", assets: Assets, language: string, reactNode: ReactNode): Promise<string> {
+async function renderToString(
+  mode: "development" | "production",
+  assets: Assets,
+  language: string,
+  pathname: string,
+  reactNode: ReactNode,
+): Promise<string> {
   const { prelude } = await prerenderToNodeStream(
     <Document
       lang={language}
       css={`/${assets.css}`}
+      pathname={pathname}
     >
       {reactNode}
     </Document>,
@@ -185,21 +192,28 @@ try {
   })
 }
 
-async function generate(mode: "development" | "production", assets: Assets, { src, out, defaultLanguage }: Config, processors: Awaited<ReturnType<typeof createProcessors>>, input: string, onGenerate?: (pathname: string) => void) {
+async function generate(
+  mode: "development" | "production",
+  assets: Assets,
+  { src, out, defaultLanguage }: Config,
+  processors: Awaited<ReturnType<typeof createProcessors>>,
+  input: string,
+  onGenerate?: (pathname: string) => void,
+) {
   const document = await fs.readFile(input, "utf8")
   const parts = path.relative(src, input).split(path.sep)
   const language = parts[0]!
   const file = await processors[language]!.process(document)
-  const string = await renderToString(mode, assets, language, file.result)
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
+  const pathname = path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")
+  const string = await renderToString(mode, assets, language, `/${pathname}`, file.result)
+
   const outPath = `${outPathWithoutExt}.html`
   await fs.mkdir(path.dirname(outPath), { recursive: true })
 
   await fs.copyFile(input, input.replace(src, out))
   await fs.writeFile(outPath, string, "utf8")
-
-  const pathname = path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")
 
   if (language === defaultLanguage) {
     const string = htmlProcessor.stringify({

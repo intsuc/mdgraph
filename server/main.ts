@@ -60,6 +60,11 @@ async function getConfig(): Promise<Config> {
 
 type Assets = { js: string, css: string }
 
+const htmlProcessor = unified()
+  .use(rehypeDocument)
+  .use(rehypePresetMinify)
+  .use(rehypeStringify)
+
 async function generateAssets({ out }: Config): Promise<Assets> {
   const assetsUrl = import.meta.resolve("./dist/assets/")
   const assetsPath = url.fileURLToPath(assetsUrl)
@@ -70,6 +75,12 @@ async function generateAssets({ out }: Config): Promise<Assets> {
     const outPath = path.join(out, file)
     await fs.copyFile(srcPath, outPath)
   }
+
+  await fs.writeFile(path.join(out, "404.html"), String(htmlProcessor.stringify({
+    type: "root",
+    children: [{ type: "text", value: "404" }],
+  })))
+
   return {
     js: files.find((file) => file.endsWith(".js"))!,
     css: files.find((file) => file.endsWith(".css"))!,
@@ -164,11 +175,6 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeStringify)
 }
 
-const redirectProcessor = unified()
-  .use(rehypeDocument)
-  .use(rehypePresetMinify)
-  .use(rehypeStringify)
-
 async function createProcessors(mode: "development" | "production", assets: Assets, config: Config): Promise<Record<string, ReturnType<typeof createProcessor>>> {
   const files = await fs.readdir(config.syntaxes)
   const langs: LanguageInput[] = await Promise.all(files.map(async (file) => {
@@ -199,7 +205,7 @@ async function generate({ src, out, defaultLanguage }: Config, processors: Await
   const pathname = path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")
 
   if (language === defaultLanguage) {
-    const string = redirectProcessor.stringify({
+    const string = htmlProcessor.stringify({
       type: "root",
       children: [h("html", [
         h("head", [
@@ -253,7 +259,13 @@ async function serve(config: Config) {
     }
   }
 
-  const handler = sirv(config.out, { dev: true })
+  const handler = sirv(config.out, {
+    dev: true,
+    onNoMatch(req, res) {
+      req.url = "/404.html"
+      handler(req, res)
+    },
+  })
   http.createServer((req, res) => {
     switch (req.url) {
       case undefined: {

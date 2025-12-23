@@ -7,11 +7,11 @@ import { ModeToggle } from "./components/mode-toggle"
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarInset, SidebarMenu, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
 
 export default function Document({
-  js,
+  lang,
   css,
   children,
 }: {
-  js?: string,
+  lang?: string,
   css?: string,
   children?: ReactNode,
 }) {
@@ -25,15 +25,14 @@ export default function Document({
   })
 
   return (
-    <ThemeProvider storageKey="ui-theme">
-      <html>
-        <head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {css && <link rel="stylesheet" href={css} />}
-          {js && <script type="module" src={js}></script>}
-        </head>
-        <body>
+    <html lang={lang}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {css ? <link rel="stylesheet" href={css} /> : null}
+      </head>
+      <body>
+        <ThemeProvider storageKey="ui-theme">
           <SidebarProvider defaultOpen={defaultOpen}>
             <Sidebar>
               <SidebarContent>
@@ -67,8 +66,8 @@ export default function Document({
               {children}
             </SidebarInset>
           </SidebarProvider>
-        </body>
-      </html>
-    </ThemeProvider>
+        </ThemeProvider>
+      </body>
+    </html>
   )
 }

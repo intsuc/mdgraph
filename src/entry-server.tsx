@@ -33,15 +33,6 @@ import type hast from "hast"
 import url from "node:url"
 import z from "zod"
 
-// @ts-ignore
-globalThis.localStorage = {
-  getItem(key: string): string | null {
-    return null
-  },
-  setItem(key: string, value: string): void {
-  },
-}
-
 const configSchema = z.object({
   $schema: z.string().default("./.mdgraph/schema.json"),
   src: z.string().default("src"),
@@ -78,29 +69,26 @@ const htmlProcessor = unified()
   .use(rehypeStringify)
 
 async function generateAssets({ out }: Config): Promise<Assets> {
-  const assetsUrl = new URL("../client/assets", import.meta.url)
-  const assetsPath = url.fileURLToPath(assetsUrl)
+  const clientUrl = new URL("../client", import.meta.url)
+  const clientPath = url.fileURLToPath(clientUrl)
+
+  const manifest = JSON.parse(await fs.readFile(path.join(clientPath, ".vite", "manifest.json"), "utf8"))
+  const js = (manifest["index.html"].file as string).slice("assets/".length)
+  const css = (manifest["index.html"].css[0] as string).slice("assets/".length)
+
   await fs.mkdir(out, { recursive: true })
-  const files = await fs.readdir(assetsPath)
-  for (const file of files) {
-    const srcPath = path.join(assetsPath, file)
-    const outPath = path.join(out, file)
-    await fs.copyFile(srcPath, outPath)
-  }
+  await fs.copyFile(path.join(clientPath, "assets", js), path.join(out, js))
+  await fs.copyFile(path.join(clientPath, "assets", css), path.join(out, css))
 
   await fs.writeFile(path.join(out, "404.html"), String(htmlProcessor.stringify({
     type: "root",
     children: [{ type: "text", value: "404" }],
   })))
 
-  return {
-    js: files.find((file) => file.endsWith(".js"))!,
-    css: files.find((file) => file.endsWith(".css"))!,
-  }
+  return { js, css }
 }
 
-const wrap: Plugin<[mode: "development" | "production", Config]> = (mode, { base, languages }: Config) => {
-  base = mode === "production" ? base : "/"
+const wrapWithDiv: Plugin = () => {
   return (tree: hast.Root) => {
     return h("div#main", { class: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert" }, [tree])
   }
@@ -108,43 +96,7 @@ const wrap: Plugin<[mode: "development" | "production", Config]> = (mode, { base
 
 const eventSourceEndpoint = "/event"
 
-const injectAssets: Plugin<[mode: "development" | "production", base: string, assets: Assets]> = (mode, base, assets) => {
-  base = mode === "production" ? base : "/"
-  return (tree: hast.Element) => {
-    const headNode = find<hast.Element>(tree, { tagName: "head" })!
-    headNode.children.push(
-      h("script", { type: "module" }, `
-try{
-  document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
-  document.getElementById("root").style.setProperty(
-    "--sidebar-width",
-    window.innerWidth < 768 || localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem",
-  )
-} catch (e) {
-}
-`),
-      h("link", { rel: "stylesheet", href: `${base}${assets.css}` }),
-      h("script", { type: "module", src: `${base}${assets.js}` }),
-    )
-
-    if (mode === "development") {
-      headNode.children.push(
-        h("script", { type: "module" }, `
-(() => {
-  new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
-    if (e.data === location.pathname) {
-      location.reload()
-    }
-  }
-})()
-`),
-      )
-    }
-  }
-}
-
-function createProcessor(mode: "development" | "production", assets: Assets, language: string, langs: LanguageInput[], config: Config) {
-  const base = mode === "production" ? config.base : "/"
+function createProcessor(langs: LanguageInput[], { themes }: Config) {
   return unified()
     .use(remarkParse)
     .use(remarkMath)
@@ -155,7 +107,7 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
     .use(rehypeMathjax)
     .use(rehypeShiki, {
       inline: "tailing-curly-colon",
-      themes: config.themes,
+      themes,
       langs,
     })
     .use(rehypeSlug)
@@ -168,19 +120,17 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
       behavior: "prepend",
       content: [h("span", { style: "margin-right: 0.25em;" }, "#")],
     })
-    .use(wrap, mode, config)
+    .use(wrapWithDiv)
     .use(rehypeReact, { Fragment, jsx, jsxs })
-  // .use(rehypeDocument, { language })
   // .use(rehypeMeta, {
   //   og: true,
   //   type: "article",
   // })
-  // .use(injectAssets, mode, base, assets)
   // .use(rehypePresetMinify)
   // .use(rehypeStringify)
 }
 
-async function createProcessors(mode: "development" | "production", assets: Assets, config: Config): Promise<Record<string, ReturnType<typeof createProcessor>>> {
+async function createProcessors(config: Config): Promise<Record<string, ReturnType<typeof createProcessor>>> {
   const files = await fs.readdir(config.syntaxes)
   const langs: LanguageInput[] = await Promise.all(files.map(async (file) => {
     // TODO: validate
@@ -189,19 +139,39 @@ async function createProcessors(mode: "development" | "production", assets: Asse
 
   const processors: Record<string, ReturnType<typeof createProcessor>> = {}
   for (const language of config.languages) {
-    processors[language] = createProcessor(mode, assets, language, langs, config)
+    processors[language] = createProcessor(langs, config)
   }
   return processors
 }
 
-async function renderToString(assets: Assets, reactNode: ReactNode): Promise<string> {
+async function renderToString(mode: "development" | "production", assets: Assets, language: string, reactNode: ReactNode): Promise<string> {
   const { prelude } = await prerenderToNodeStream(
     <Document
-      js={`/${assets.js}`}
+      lang={language}
       css={`/${assets.css}`}
     >
       {reactNode}
-    </Document>
+    </Document>,
+    {
+      bootstrapModules: [`/${assets.js}`],
+      bootstrapScriptContent: `
+try {
+  document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
+  document.getElementById("root").style.setProperty(
+    "--sidebar-width",
+    window.innerWidth < 768 || localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem",
+  )
+  ${mode === "development" ? `
+  new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
+    if (e.data === location.pathname) {
+      location.reload()
+    }
+  }
+  ` : ""}
+} catch (e) {
+}
+`
+    }
   )
 
   return new Promise((resolve, reject) => {
@@ -217,7 +187,7 @@ async function generate(mode: "development" | "production", assets: Assets, { sr
   const parts = path.relative(src, input).split(path.sep)
   const language = parts[0]!
   const file = await processors[language]!.process(document)
-  const string = await renderToString(assets, file.result)
+  const string = await renderToString(mode, assets, language, file.result)
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
   const outPath = `${outPathWithoutExt}.html`
@@ -266,7 +236,7 @@ async function clean(config: Config) {
 async function build(config: Config) {
   const assets = await generateAssets(config)
 
-  const processors = await createProcessors("production", assets, config)
+  const processors = await createProcessors(config)
 
   for await (const input of fs.glob(path.join(config.src, "**/*.md"))) {
     await generate("production", assets, config, processors, input)
@@ -278,7 +248,7 @@ async function build(config: Config) {
 async function serve(config: Config) {
   const assets = await generateAssets(config)
 
-  const processors = await createProcessors("development", assets, config)
+  const processors = await createProcessors(config)
 
   const clients: Record<string, http.ServerResponse> = {}
   function sendEventToAll(pathname: string) {

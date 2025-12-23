@@ -33,6 +33,9 @@ import type hast from "hast"
 import url from "node:url"
 import z from "zod"
 
+// @ts-expect-error
+localStorage = { getItem: (_key: string): string | null => null }
+
 const configSchema = z.object({
   $schema: z.string().default("./.mdgraph/schema.json"),
   src: z.string().default("src"),

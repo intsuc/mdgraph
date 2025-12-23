@@ -39,6 +39,7 @@ jobs:
           pnpm build
           pnpm link
           cd ../example
+          mdgraph clean
           mdgraph build
       - name: Setup Pages
         uses: actions/configure-pages@v5

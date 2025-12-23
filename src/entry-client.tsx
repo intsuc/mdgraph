@@ -2,6 +2,6 @@
 
 import { hydrateRoot } from "react-dom/client"
 import "./index.css"
-import App from "./App.tsx"
+import Document from "./Document.tsx"
 
-hydrateRoot(document, <App />)
+hydrateRoot(document, <Document />)

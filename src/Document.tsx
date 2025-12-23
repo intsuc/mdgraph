@@ -1,0 +1,71 @@
+import { useState } from "react"
+import "./index.css"
+import { PictureInPictureIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ThemeProvider } from "./components/theme-provider"
+import { ModeToggle } from "./components/mode-toggle"
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarInset, SidebarMenu, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
+
+export default function Document({ css }: { css?: string }) {
+  const [defaultOpen] = useState(() => {
+    const sidebarState = localStorage.getItem("sidebar-state")
+    switch (sidebarState) {
+      case "expanded": return true
+      case "collapsed": return false
+      default: return true
+    }
+  })
+
+  return (
+    <ThemeProvider storageKey="ui-theme">
+      <html>
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="stylesheet" href={css}></link>
+        </head>
+        <body>
+          <SidebarProvider defaultOpen={defaultOpen}>
+            <Sidebar>
+              <SidebarContent>
+                <SidebarGroup>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+              </SidebarContent>
+              <SidebarRail />
+            </Sidebar>
+            <SidebarInset>
+              <div id="header" className="p-2 h-13 sticky top-0 flex items-center justify-between bg-background">
+                <div>
+                  <SidebarTrigger />
+                </div>
+                <div className="flex gap-2">
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    asChild
+                  >
+                    <a
+                      title="View in Graph"
+                      aria-label="View in Graph"
+                    >
+                      <PictureInPictureIcon size={24} />
+                    </a>
+                  </Button>
+                  <ModeToggle />
+                </div>
+              </div>
+              <div
+                className="mx-auto px-4 py-8 prose prose-zinc dark:prose-invert"
+              />
+            </SidebarInset>
+          </SidebarProvider>
+        </body>
+      </html>
+    </ThemeProvider>
+  )
+}

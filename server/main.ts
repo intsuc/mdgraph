@@ -235,6 +235,10 @@ async function init() {
   ])
 }
 
+async function clean(config: Config) {
+  await fs.rm(config.out, { recursive: true, force: true })
+}
+
 async function build(config: Config) {
   const assets = await generateAssets(config)
 
@@ -307,6 +311,13 @@ program
   .command("init")
   .action(() => {
     void init()
+  })
+
+program
+  .command("clean")
+  .action(async () => {
+    const config = await getConfig()
+    await clean(config)
   })
 
 program

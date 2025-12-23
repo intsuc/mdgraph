@@ -47,7 +47,7 @@ export default function Document({
               <SidebarRail />
             </Sidebar>
             <SidebarInset>
-              <div id="header" className="p-2 h-13 sticky top-0 flex items-center justify-between bg-background">
+              <div className="p-2 h-13 sticky top-0 flex items-center justify-between bg-background">
                 <div>
                   <SidebarTrigger />
                 </div>
@@ -57,10 +57,7 @@ export default function Document({
                     size="icon"
                     asChild
                   >
-                    <a
-                      title="View in Graph"
-                      aria-label="View in Graph"
-                    >
+                    <a title="View in Graph" aria-label="View in Graph">
                       <PictureInPictureIcon size={24} />
                     </a>
                   </Button>

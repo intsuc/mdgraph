@@ -4,9 +4,9 @@ import { h } from "hastscript"
 import { prerenderToNodeStream } from "react-dom/static"
 import { toc as rehypeToc } from "@jsdevtools/rehype-toc"
 import { unified, type Plugin } from "unified"
-import Document from "./Document"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
+import Document from "./Document"
 import fs from "node:fs/promises"
 import http from "node:http"
 import path from "node:path"
@@ -16,6 +16,7 @@ import rehypeInferTitleMeta from "rehype-infer-title-meta"
 import rehypeMathjax from "rehype-mathjax"
 import rehypeMeta from "rehype-meta"
 import rehypePresetMinify from "rehype-preset-minify"
+import rehypeReact from "rehype-react"
 import rehypeShiki from "@shikijs/rehype"
 import rehypeSlug from "rehype-slug"
 import rehypeStringify from "rehype-stringify"
@@ -25,11 +26,12 @@ import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import sirv from "sirv"
 import stringWidth from "string-width"
-import type { Element } from "hast"
+import type hast from "hast"
 import type { LanguageInput } from "@shikijs/types"
 import type { ReactNode } from "react"
 import url from "node:url"
 import z from "zod"
+import { Fragment, jsx, jsxs } from "react/jsx-runtime"
 
 const configSchema = z.object({
   $schema: z.string().default("./.mdgraph/schema.json"),
@@ -67,7 +69,7 @@ const htmlProcessor = unified()
   .use(rehypeStringify)
 
 async function generateAssets({ out }: Config): Promise<Assets> {
-  const assetsUrl = import.meta.resolve("./dist/assets/")
+  const assetsUrl = new URL("../client/assets", import.meta.url)
   const assetsPath = url.fileURLToPath(assetsUrl)
   await fs.mkdir(out, { recursive: true })
   const files = await fs.readdir(assetsPath)
@@ -92,8 +94,8 @@ const eventSourceEndpoint = "/event"
 
 const injectAssets: Plugin<[mode: "development" | "production", base: string, assets: Assets]> = (mode, base, assets) => {
   base = mode === "production" ? base : "/"
-  return (tree) => {
-    const headNode = find<Element>(tree, { tagName: "head" })!
+  return (tree: hast.Element) => {
+    const headNode = find<hast.Element>(tree, { tagName: "head" })!
     headNode.children.push(
       h("script", { type: "module" }, `
 try{
@@ -156,8 +158,9 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
       type: "article",
     })
     .use(injectAssets, mode, base, assets)
-    .use(rehypePresetMinify)
-    .use(rehypeStringify)
+    .use(rehypeReact, { Fragment, jsx, jsxs })
+  // .use(rehypePresetMinify)
+  // .use(rehypeStringify)
 }
 
 async function createProcessors(mode: "development" | "production", assets: Assets, config: Config): Promise<Record<string, ReturnType<typeof createProcessor>>> {
@@ -174,18 +177,49 @@ async function createProcessors(mode: "development" | "production", assets: Asse
   return processors
 }
 
-async function generate({ src, out, defaultLanguage }: Config, processors: Awaited<ReturnType<typeof createProcessors>>, input: string, onGenerate?: (pathname: string) => void) {
+async function renderToString(mode: "development" | "production", bootstrapModule: string, reactNode: ReactNode): Promise<string> {
+  const { prelude } = await prerenderToNodeStream(reactNode, {
+    //     bootstrapScriptContent: `
+    // try{
+    //   document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
+    //   document.getElementById("root").style.setProperty(
+    //     "--sidebar-width",
+    //     window.innerWidth < 768 || localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem",
+    //   )
+    // } catch (e) {
+    // }
+    // ${mode === "development" ? `
+    // new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
+    //   if (e.data === location.pathname) {
+    //     location.reload()
+    //   }
+    // }
+    // ` : ""}
+    // `,
+    //     bootstrapModules: [bootstrapModule],
+  })
+
+  return new Promise((resolve, reject) => {
+    let data = ""
+    prelude.on("data", chunk => { data += chunk })
+    prelude.on("end", () => resolve(data))
+    prelude.on("error", reject)
+  })
+}
+
+async function generate(mode: "development" | "production", { src, out, defaultLanguage }: Config, processors: Awaited<ReturnType<typeof createProcessors>>, input: string, onGenerate?: (pathname: string) => void) {
   const document = await fs.readFile(input, "utf8")
   const parts = path.relative(src, input).split(path.sep)
   const language = parts[0]!
   const file = await processors[language]!.process(document)
+  const string = await renderToString(mode, "todo", file.result)
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
   const outPath = `${outPathWithoutExt}.html`
   await fs.mkdir(path.dirname(outPath), { recursive: true })
 
   await fs.copyFile(input, input.replace(src, out))
-  await fs.writeFile(outPath, String(file), "utf8")
+  await fs.writeFile(outPath, string, "utf8")
 
   const pathname = path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")
 
@@ -230,7 +264,7 @@ async function build(config: Config) {
   const processors = await createProcessors("production", assets, config)
 
   for await (const input of fs.glob(path.join(config.src, "**/*.md"))) {
-    await generate(config, processors, input)
+    await generate("production", config, processors, input)
   }
 
   console.log("Build completed")
@@ -286,8 +320,8 @@ async function serve(config: Config) {
   })
 
   chokidar.watch(config.src)
-    .on("add", (path) => void generate(config, processors, path, sendEventToAll))
-    .on("change", (path) => void generate(config, processors, path, sendEventToAll))
+    .on("add", (path) => void generate("development", config, processors, path, sendEventToAll))
+    .on("change", (path) => void generate("development", config, processors, path, sendEventToAll))
 }
 
 const program = new Command()
@@ -320,31 +354,3 @@ program
   })
 
 program.parse(process.argv)
-
-// async function renderToString(bootstrapModule: string, reactNode: ReactNode): Promise<string> {
-//   const { prelude } = await prerenderToNodeStream(reactNode, {
-//     bootstrapModules: [bootstrapModule],
-//   })
-//
-//   return new Promise((resolve, reject) => {
-//     let data = ""
-//     prelude.on("data", chunk => {
-//       data += chunk
-//     })
-//     prelude.on("end", () => resolve(data))
-//     prelude.on("error", reject)
-//   })
-// }
-//
-// const manifest = JSON.parse(await fs.readFile("dist/client/.vite/manifest.json", "utf8"))
-// const js = manifest["index.html"].file as string
-// const css = manifest["index.html"].css[0] as string
-// const string = await renderToString(js, <App css={css} />)
-//
-// await fs.rm("dist/all", { recursive: true, force: true })
-// await fs.mkdir("dist/all", { recursive: true })
-// await fs.writeFile("dist/all/index.html", string)
-//
-// await fs.mkdir("dist/all/assets", { recursive: true })
-// await fs.copyFile("dist/client/" + js, "dist/all/" + js)
-// await fs.copyFile("dist/client/" + css, "dist/all/" + css)

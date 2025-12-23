@@ -16,6 +16,7 @@ import rehypeDocument from "rehype-document"
 import rehypeInferTitleMeta from "rehype-infer-title-meta"
 import rehypeMathjax from "rehype-mathjax"
 import rehypeMeta from "rehype-meta"
+import rehypeParse from "rehype-parse"
 import rehypePresetMinify from "rehype-preset-minify"
 import rehypeReact from "rehype-react"
 import rehypeShiki from "@shikijs/rehype"
@@ -99,6 +100,15 @@ const wrapWithDiv: Plugin = () => {
 
 const eventSourceEndpoint = "/event"
 
+const postProcessor = unified()
+  .use(rehypeParse)
+  .use(rehypeMeta, {
+    og: true,
+    type: "article",
+  })
+  .use(rehypePresetMinify)
+  .use(rehypeStringify)
+
 function createProcessor(langs: LanguageInput[], { themes }: Config) {
   return unified()
     .use(remarkParse)
@@ -125,12 +135,6 @@ function createProcessor(langs: LanguageInput[], { themes }: Config) {
     })
     .use(wrapWithDiv)
     .use(rehypeReact, { Fragment, jsx, jsxs })
-  // .use(rehypeMeta, {
-  //   og: true,
-  //   type: "article",
-  // })
-  // .use(rehypePresetMinify)
-  // .use(rehypeStringify)
 }
 
 async function createProcessors(config: Config): Promise<Record<string, ReturnType<typeof createProcessor>>> {
@@ -154,34 +158,34 @@ async function renderToString(
   pathname: string,
   reactNode: ReactNode,
 ): Promise<string> {
+  const bootstrapScriptContent = `
+try {
+  document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
+  document.body.style.setProperty(
+    "--sidebar-width",
+    window.innerWidth < 768 || localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem",
+  )
+} catch (e) {
+  console.error(e)
+}
+${mode === "development" ? `
+new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
+  if (e.data === location.pathname) {
+    location.reload()
+  }
+}
+` : ""}
+`
   const { prelude } = await prerenderToNodeStream(
     <Document
       lang={language}
       css={`/${assets.css}`}
+      bootstrapModule={`/${assets.js}`}
+      bootstrapScriptContent={bootstrapScriptContent}
       pathname={pathname}
     >
       {reactNode}
-    </Document>,
-    {
-      bootstrapModules: [`/${assets.js}`],
-      bootstrapScriptContent: `
-try {
-  document.documentElement.classList.add(localStorage.getItem("ui-theme") ?? "light")
-  document.getElementById("root").style.setProperty(
-    "--sidebar-width",
-    window.innerWidth < 768 || localStorage.getItem("sidebar-state") === "collapsed" ? "0" : "16rem",
-  )
-  ${mode === "development" ? `
-  new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
-    if (e.data === location.pathname) {
-      location.reload()
-    }
-  }
-  ` : ""}
-} catch (e) {
-}
-`
-    }
+    </Document>
   )
 
   return new Promise((resolve, reject) => {
@@ -203,11 +207,13 @@ async function generate(
   const document = await fs.readFile(input, "utf8")
   const parts = path.relative(src, input).split(path.sep)
   const language = parts[0]!
-  const file = await processors[language]!.process(document)
+  const preprocessedFile = await processors[language]!.process(document)
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
   const pathname = path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")
-  const string = await renderToString(mode, assets, language, `/${pathname}`, file.result)
+  const rendered = await renderToString(mode, assets, language, `/${pathname}`, preprocessedFile.result)
+  const postprocessedFile = await postProcessor.process(rendered)
+  const string = String(postprocessedFile)
 
   const outPath = `${outPathWithoutExt}.html`
   await fs.mkdir(path.dirname(outPath), { recursive: true })

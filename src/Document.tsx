@@ -10,11 +10,15 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarInse
 export default function Document({
   lang,
   css,
+  bootstrapScriptContent,
+  bootstrapModule,
   pathname = location.pathname,
   children,
 }: {
   lang?: string,
   css?: string,
+  bootstrapScriptContent?: string,
+  bootstrapModule?: string,
   pathname?: string,
   children?: ReactNode,
 }) {
@@ -30,14 +34,16 @@ export default function Document({
   })
 
   return (
-    <html lang={lang}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {css ? <link rel="stylesheet" href={css} /> : null}
-      </head>
-      <body>
-        <ThemeProvider storageKey="ui-theme">
+    <ThemeProvider storageKey="ui-theme">
+      <html lang={lang}>
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          {bootstrapScriptContent ? <script type="module" dangerouslySetInnerHTML={{ __html: bootstrapScriptContent }} /> : null}
+          {css ? <link rel="stylesheet" href={css} /> : null}
+          {bootstrapModule ? <script type="module" src={bootstrapModule} /> : null}
+        </head>
+        <body>
           <SidebarProvider defaultOpen={defaultOpen}>
             <Sidebar>
               <SidebarContent>
@@ -108,8 +114,8 @@ export default function Document({
               {children}
             </SidebarInset>
           </SidebarProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ThemeProvider>
   )
 }

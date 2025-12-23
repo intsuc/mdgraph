@@ -88,21 +88,6 @@ async function generateAssets({ out }: Config): Promise<Assets> {
   }
 }
 
-const wrapWithRoot: Plugin<[mode: "development" | "production", Config]> = (mode, { base, languages }: Config) => {
-  base = mode === "production" ? base : "/"
-  return (tree) => {
-    return h("div#root", { "data-base": base, "data-languages": languages }, [
-      h("div", { class: "flex w-full" }, [
-        h("div", { class: "w-(--sidebar-width) h-screen bg-sidebar" }),
-        h("main", { class: "flex-1" }, [
-          h("div", { class: "p-2 h-13 sticky top-0 flex gap-2 justify-end bg-background" }),
-          h("div#main", { class: "mx-auto px-4 py-8 prose prose-zinc dark:prose-invert" }, [tree as Element]),
-        ]),
-      ]),
-    ])
-  }
-}
-
 const eventSourceEndpoint = "/event"
 
 const injectAssets: Plugin<[mode: "development" | "production", base: string, assets: Assets]> = (mode, base, assets) => {
@@ -165,7 +150,6 @@ function createProcessor(mode: "development" | "production", assets: Assets, lan
       behavior: "prepend",
       content: [h("span", { style: "margin-right: 0.25em;" }, "#")],
     })
-    .use(wrapWithRoot, mode, config)
     .use(rehypeDocument, { language })
     .use(rehypeMeta, {
       og: true,

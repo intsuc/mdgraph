@@ -9,10 +9,6 @@
       "DOM.Iterable"
     ],
     "module": "esnext",
-    "types": [
-      "vite/client",
-      "@types/dom-chromium-ai"
-    ],
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

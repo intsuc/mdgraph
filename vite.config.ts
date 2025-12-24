@@ -1,11 +1,10 @@
+import path from "path"
 import { defineConfig } from "vite"
-import tsConfigPaths from "vite-tsconfig-paths"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 
 export default defineConfig({
   plugins: [
-    tsConfigPaths(),
     react({
       babel: {
         plugins: [["babel-plugin-react-compiler"]],
@@ -13,8 +12,12 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   build: {
-    emptyOutDir: true,
-    outDir: "../server/dist",
+    manifest: true,
   },
 })

@@ -3,7 +3,6 @@ import { find } from "unist-util-find"
 import { Fragment, jsx, jsxs } from "react/jsx-runtime"
 import { h } from "hastscript"
 import { prerenderToNodeStream } from "react-dom/static"
-import { toc as rehypeToc } from "@jsdevtools/rehype-toc"
 import { unified, type Plugin } from "unified"
 import chokidar from "chokidar"
 import crypto from "node:crypto"
@@ -124,10 +123,6 @@ function createProcessor(langs: LanguageInput[], { themes }: Config) {
       langs,
     })
     .use(rehypeSlug)
-    .use(rehypeToc, {
-      headings: ["h1", "h2", "h3"],
-      cssClasses: { toc: "hidden" },
-    })
     .use(rehypeInferTitleMeta)
     .use(rehypeAutolinkHeadings, {
       behavior: "prepend",

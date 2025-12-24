@@ -12,6 +12,7 @@ export default function Document({
   css,
   bootstrapScriptContent,
   bootstrapModule,
+  languages,
   pathname = location.pathname,
   children,
 }: {
@@ -19,6 +20,7 @@ export default function Document({
   css?: string,
   bootstrapScriptContent?: string,
   bootstrapModule?: string,
+  languages?: string[],
   pathname?: string,
   children?: ReactNode,
 }) {

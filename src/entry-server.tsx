@@ -150,6 +150,7 @@ async function renderToString(
   mode: "development" | "production",
   assets: Assets,
   language: string,
+  languages: string[],
   pathname: string,
   reactNode: ReactNode,
 ): Promise<string> {
@@ -177,6 +178,7 @@ new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
       css={`/${assets.css}`}
       bootstrapModule={`/${assets.js}`}
       bootstrapScriptContent={bootstrapScriptContent}
+      languages={languages}
       pathname={pathname}
     >
       {reactNode}
@@ -194,7 +196,7 @@ new EventSource("${eventSourceEndpoint}").onmessage = (e) => {
 async function generate(
   mode: "development" | "production",
   assets: Assets,
-  { src, out, defaultLanguage }: Config,
+  { src, out, languages, defaultLanguage }: Config,
   processors: Awaited<ReturnType<typeof createProcessors>>,
   input: string,
   onGenerate?: (pathname: string) => void,
@@ -206,7 +208,7 @@ async function generate(
 
   const outPathWithoutExt = input.replace(src, out).replace(/\.md$/, "")
   const pathname = path.relative(out, outPathWithoutExt).replace(/\\/g, "/").replace(/index$/, "")
-  const rendered = await renderToString(mode, assets, language, `/${pathname}`, preprocessedFile.result)
+  const rendered = await renderToString(mode, assets, language, languages, `/${pathname}`, preprocessedFile.result)
   const postprocessedFile = await postProcessor.process(rendered)
   const string = String(postprocessedFile)
 
